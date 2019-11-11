@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AzureSpatialAnchors.Examples/Scenes/AzureSpatialAnchorsDemoLauncher.unity
     guid: 4dcd43f53c599f94a80fb2408d9a15ff
-  - enabled: 1
+  - enabled: 0
     path: Assets/AzureSpatialAnchors.Examples/Scenes/AzureSpatialAnchorsBasicDemo.unity
     guid: 8eb951603c1152c4e920887a18cc2733
-  - enabled: 1
+  - enabled: 0
     path: Assets/AzureSpatialAnchors.Examples/Scenes/AzureSpatialAnchorsNearbyDemo.unity
     guid: 2e7fd4a208fcf48419d312fcf7b9553e
   - enabled: 1
