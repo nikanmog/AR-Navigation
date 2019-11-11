@@ -1,0 +1,7 @@
+﻿  pch.cpp
+  App.cpp
+  Main.cpp
+  UnityGenerated.cpp
+C:\Users\t-nimogh\Code\AR-Navigation-Private\HoloLens\AR-Navigation\App.cpp(26,1): warning C4973: 'Windows::UI::ViewManagement::IApplicationView2::SuppressSystemOverlays::set': marked as deprecated
+C:\Users\t-nimogh\Code\AR-Navigation-Private\HoloLens\AR-Navigation\App.cpp(26,1): message : Message: 'Use the TryEnterFullScreen method and IsFullScreenMode property instead of SuppressSystemOverlays. For more info, see MSDN.'
+  AR-Navigation.vcxproj -> C:\Users\t-nimogh\Code\AR-Navigation-Private\HoloLens\build\bin\Win32\Debug\AR-Navigation.exe

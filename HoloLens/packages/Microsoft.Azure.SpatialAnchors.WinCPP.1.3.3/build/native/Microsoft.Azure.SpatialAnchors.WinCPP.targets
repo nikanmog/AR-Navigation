@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="AzureSpatialAnchors_WinCPP_init">
+  <PropertyGroup Label="Default initializers for properties">
+    <Linkage-AzureSpatialAnchors_WinCPP Condition="'$(Linkage-AzureSpatialAnchors_WinCPP)' == ''">dynamic</Linkage-AzureSpatialAnchors_WinCPP>
+    <CallingConvention-AzureSpatialAnchors_WinCPP Condition="'$(CallingConvention-AzureSpatialAnchors_WinCPP)' == ''">cdecl</CallingConvention-AzureSpatialAnchors_WinCPP>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="Win32" Condition="'$(Platform.ToLower())' == 'win32'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib/Win32\Release\AzureSpatialAnchors.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="x64" Condition="'$(Platform.ToLower())' == 'x64'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib/x64\Release\AzureSpatialAnchors.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="ARM" Condition="'$(Platform.ToLower())' == 'arm'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib/ARM\Release\AzureSpatialAnchors.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="ARM64" Condition="'$(Platform.ToLower())' == 'arm64'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib/ARM64\Release\AzureSpatialAnchors.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)\default-propertiesui.xml" />
+  </ItemGroup>
+  <UsingTask TaskName="AzureSpatialAnchors_WinCPP_Contains" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
+    <ParameterGroup>
+      <Text Output="false" ParameterType="System.String" />
+      <Library Output="false" Required="true" ParameterType="System.String" />
+      <Value Output="false" Required="true" ParameterType="System.String" />
+      <Result Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Code>Result = ((Text ?? "").Split(';').Contains(Library) ) ? Value : String.Empty;</Code>
+    </Task>
+  </UsingTask>
+  <Target Name="AzureSpatialAnchors_WinCPP_init">
+    <AzureSpatialAnchors_WinCPP_Contains Text="Linkage-dynamic" Library="AzureSpatialAnchors_WinCPP" Value="dynamic" Condition="'$(Linkage-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="Linkage-static" Library="AzureSpatialAnchors_WinCPP" Value="static" Condition="'$(Linkage-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="Linkage-ltcg" Library="AzureSpatialAnchors_WinCPP" Value="ltcg" Condition="'$(Linkage-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="Linkage-sxs" Library="AzureSpatialAnchors_WinCPP" Value="sxs" Condition="'$(Linkage-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="CallingConvention-cdecl" Library="AzureSpatialAnchors_WinCPP" Value="cdecl" Condition="'$(CallingConvention-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="CallingConvention-stdcall" Library="AzureSpatialAnchors_WinCPP" Value="stdcall" Condition="'$(CallingConvention-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="CallingConvention-fastcall" Library="AzureSpatialAnchors_WinCPP" Value="fastcall" Condition="'$(CallingConvention-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="CallingConvention-thiscall" Library="AzureSpatialAnchors_WinCPP" Value="thiscall" Condition="'$(CallingConvention-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+    <AzureSpatialAnchors_WinCPP_Contains Text="CallingConvention-clrcall" Library="AzureSpatialAnchors_WinCPP" Value="clrcall" Condition="'$(CallingConvention-AzureSpatialAnchors_WinCPP)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-AzureSpatialAnchors_WinCPP" />
+    </AzureSpatialAnchors_WinCPP_Contains>
+  </Target>
+</Project>

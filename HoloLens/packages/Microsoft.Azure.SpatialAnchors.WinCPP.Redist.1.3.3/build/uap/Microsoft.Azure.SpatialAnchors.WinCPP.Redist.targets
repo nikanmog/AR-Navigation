@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- For Unity csproj's -->
+  <PropertyGroup>
+	  <AzureSpatialAnchorsUnityTarget Condition=" '$(UnityWSAToolsDir)' != '' ">true</AzureSpatialAnchorsUnityTarget>
+  </PropertyGroup>
+  <ItemGroup Condition=" $(AzureSpatialAnchorsUnityTarget) == true and $(MSBuildProjectFile.EndsWith('.csproj')) and '$(Platform.ToLower())' == 'arm' ">
+    <Content Include="$(AzureSpatialAnchorsSdkPath)\ARM\Release\AzureSpatialAnchors.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition=" $(AzureSpatialAnchorsUnityTarget) == true and $(MSBuildProjectFile.EndsWith('.csproj')) and '$(Platform.ToLower())' == 'arm64' ">
+    <Content Include="$(AzureSpatialAnchorsSdkPath)\ARM64\Release\AzureSpatialAnchors.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition=" $(AzureSpatialAnchorsUnityTarget) == true and $(MSBuildProjectFile.EndsWith('.csproj')) and '$(Platform.ToLower())' == 'x64' ">
+    <Content Include="$(AzureSpatialAnchorsSdkPath)\x64\Release\AzureSpatialAnchors.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup Condition=" $(AzureSpatialAnchorsUnityTarget) == true and $(MSBuildProjectFile.EndsWith('.csproj')) and '$(Platform.ToLower())' == 'x86' ">
+    <Content Include="$(AzureSpatialAnchorsSdkPath)\Win32\Release\AzureSpatialAnchors.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
