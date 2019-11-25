@@ -2643,6 +2643,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.SpatialAnchors
@@ -2941,287 +2943,287 @@ namespace Microsoft.Azure.SpatialAnchors
     internal static class NativeLibrary
     {
         internal const string DllName = "AzureSpatialAnchors";
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_locate_anchors_completed_event_args_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_locate_anchors_completed_event_args_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_locate_anchors_completed_event_args_get_cancelled(IntPtr handle, out Boolean result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_locate_anchors_completed_event_args_get_watcher(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_watcher_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_watcher_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_watcher_get_identifier(IntPtr handle, out Int32 result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_watcher_stop(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_located_event_args_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_located_event_args_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_located_event_args_get_anchor(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_create(out IntPtr instance);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_get_local_anchor(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_set_local_anchor(IntPtr handle, IntPtr value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_get_expiration(IntPtr handle, out long result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_set_expiration(IntPtr handle, long value);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_get_identifier_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_get_identifier_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_get_identifier(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_get_app_properties(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_get_count(IntPtr handle, out Int32 result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_clear(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_idictionary_string_string_get_key_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_idictionary_string_string_get_key_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_get_key(IntPtr handle, Int32 index, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_idictionary_string_string_get_item_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_idictionary_string_string_get_item_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_get_item(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string key, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_idictionary_string_string_set_item_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_idictionary_string_string_set_item_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_set_item(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string key, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_idictionary_string_string_remove_key_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_idictionary_string_string_remove_key_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_idictionary_string_string_remove_key(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string key);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_get_version_tag_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_get_version_tag_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_get_version_tag(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_anchor_located_event_args_get_identifier_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_anchor_located_event_args_get_identifier_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_located_event_args_get_identifier(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_located_event_args_get_status(IntPtr handle, out LocateAnchorStatus result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_located_event_args_get_watcher(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_addref(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_get_account_domain_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_get_account_domain_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_get_account_domain(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_set_account_domain_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_set_account_domain_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_set_account_domain(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_get_account_id_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_get_account_id_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_get_account_id(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_set_account_id_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_set_account_id_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_set_account_id(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_get_authentication_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_get_authentication_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_get_authentication_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_set_authentication_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_set_authentication_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_set_authentication_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_get_account_key_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_get_account_key_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_get_account_key(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_set_account_key_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_set_account_key_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_set_account_key(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_get_access_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_get_access_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_get_access_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_session_configuration_set_access_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_configuration_set_access_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_configuration_set_access_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_create(out IntPtr instance);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_configuration(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_diagnostics(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_get_log_level(IntPtr handle, out SessionLogLevel result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_set_log_level(IntPtr handle, SessionLogLevel value);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_diagnostics_get_log_directory_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_diagnostics_get_log_directory_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_get_log_directory(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_diagnostics_set_log_directory_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_diagnostics_set_log_directory_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_set_log_directory(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_get_max_disk_size_in_mb(IntPtr handle, out Int32 result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_set_max_disk_size_in_mb(IntPtr handle, Int32 value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_get_images_enabled(IntPtr handle, out Boolean result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_set_images_enabled(IntPtr handle, Boolean value);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_diagnostics_create_manifest_async_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_diagnostics_create_manifest_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_create_manifest_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string description, [MarshalAs(UnmanagedType.LPWStr)] out String result);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_diagnostics_submit_manifest_async_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_diagnostics_submit_manifest_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_diagnostics_submit_manifest_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string manifest_path);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_log_level(IntPtr handle, out SessionLogLevel result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_log_level(IntPtr handle, SessionLogLevel value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_session(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_session(IntPtr handle, IntPtr value);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_get_session_id_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_session_id_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_session_id(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_get_middleware_versions_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_middleware_versions_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_middleware_versions(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_set_middleware_versions_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_set_middleware_versions_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_middleware_versions(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_get_sdk_package_type_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_sdk_package_type_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_sdk_package_type(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_set_sdk_package_type_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_set_sdk_package_type_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_sdk_package_type(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_token_required(IntPtr handle, ulong value, TokenRequiredDelegateNative value_fn);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_addref(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_token_required_event_args_get_access_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_token_required_event_args_get_access_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_get_access_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_token_required_event_args_set_access_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_token_required_event_args_set_access_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_set_access_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, EntryPoint = "ssc_token_required_event_args_get_authentication_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_token_required_event_args_get_authentication_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_get_authentication_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, EntryPoint = "ssc_token_required_event_args_set_authentication_token_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_token_required_event_args_set_authentication_token_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_set_authentication_token(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_token_required_event_args_get_deferral(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_deferral_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_deferral_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_deferral_complete(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_anchor_located(IntPtr handle, ulong value, AnchorLocatedDelegateNative value_fn);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_locate_anchors_completed(IntPtr handle, ulong value, LocateAnchorsCompletedDelegateNative value_fn);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_session_updated(IntPtr handle, ulong value, SessionUpdatedDelegateNative value_fn);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_updated_event_args_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_updated_event_args_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_updated_event_args_get_status(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_ready_for_create_progress(IntPtr handle, out Single result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_recommended_for_create_progress(IntPtr handle, out Single result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_session_create_hash(IntPtr handle, out Int32 result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_session_locate_hash(IntPtr handle, out Int32 result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_status_get_user_feedback(IntPtr handle, out SessionUserFeedback result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_error(IntPtr handle, ulong value, SessionErrorDelegateNative value_fn);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_error_event_args_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_error_event_args_addref(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_session_error_event_args_get_error_message_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_session_error_event_args_get_error_message_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_error_event_args_get_error_message(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_session_error_event_args_get_watcher(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_set_on_log_debug(IntPtr handle, ulong value, OnLogDebugDelegateNative value_fn);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_on_log_debug_event_args_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_on_log_debug_event_args_addref(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_on_log_debug_event_args_get_message_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_on_log_debug_event_args_get_message_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_on_log_debug_event_args_get_message(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_dispose(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_get_access_token_with_authentication_token_async_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_access_token_with_authentication_token_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_access_token_with_authentication_token_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string authentication_token, [MarshalAs(UnmanagedType.LPWStr)] out String result);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_get_access_token_with_account_key_async_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_access_token_with_account_key_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_access_token_with_account_key_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string account_key, [MarshalAs(UnmanagedType.LPWStr)] out String result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_create_anchor_async(IntPtr handle, IntPtr anchor);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_create_watcher(IntPtr handle, IntPtr criteria, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_addref(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_anchor_locate_criteria_get_identifiers_wide_flat", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_get_identifiers_wide_flat", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_identifiers(IntPtr handle, out IntPtr result, out int result_count);
-        [DllImport(DllName, EntryPoint = "ssc_anchor_locate_criteria_set_identifiers_wide", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPWStr)] String[] value, int value_count);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_anchor_locate_criteria_set_identifiers_wide", CallingConvention=CallingConvention.Cdecl)]
+        internal static extern status ssc_anchor_locate_criteria_set_identifiers(IntPtr handle, [MarshalAs(UnmanagedType.LPArray, ArraySubType=UnmanagedType.LPWStr)] String[] value, int value_count);
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_bypass_cache(IntPtr handle, out Boolean result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_bypass_cache(IntPtr handle, Boolean value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_near_anchor(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_release(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_addref(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_source_anchor(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_source_anchor(IntPtr handle, IntPtr value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_distance_in_meters(IntPtr handle, out Single result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_distance_in_meters(IntPtr handle, Single value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_get_max_result_count(IntPtr handle, out Int32 result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_set_max_result_count(IntPtr handle, Int32 value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_near_anchor_criteria_create(out IntPtr instance);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_near_anchor(IntPtr handle, IntPtr value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_requested_categories(IntPtr handle, out AnchorDataCategory result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_requested_categories(IntPtr handle, AnchorDataCategory value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_get_strategy(IntPtr handle, out LocateStrategy result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_set_strategy(IntPtr handle, LocateStrategy value);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_anchor_locate_criteria_create(out IntPtr instance);
-        [DllImport(DllName, EntryPoint = "ssc_cloud_spatial_anchor_session_get_anchor_properties_async_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_cloud_spatial_anchor_session_get_anchor_properties_async_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_anchor_properties_async(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] string identifier, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_active_watchers_count(IntPtr handle, out Int32 result_count);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_active_watchers_items(IntPtr handle, [MarshalAs(UnmanagedType.LPArray), In, Out] IntPtr[] result_array, ref Int32 result_count);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_refresh_anchor_properties_async(IntPtr handle, IntPtr anchor);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_update_anchor_properties_async(IntPtr handle, IntPtr anchor);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_delete_anchor_async(IntPtr handle, IntPtr anchor);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_get_session_status_async(IntPtr handle, out IntPtr result);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_start(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_stop(IntPtr handle);
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_cloud_spatial_anchor_session_reset(IntPtr handle);
-        [DllImport(DllName, EntryPoint = "ssc_get_error_details_wide", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DllName, EntryPoint="ssc_get_error_details_wide", CallingConvention=CallingConvention.Cdecl)]
         internal static extern status ssc_get_error_details(IntPtr handle, [MarshalAs(UnmanagedType.LPWStr)] out string result_message, [MarshalAs(UnmanagedType.LPWStr)] out string result_requestCorrelationVector, [MarshalAs(UnmanagedType.LPWStr)] out string result_responseCorrelationVector);
     }
 
@@ -3871,7 +3873,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.NearAnchorCriteria result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_locate_criteria_get_near_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.NearAnchorCriteria(result_handle, transfer:true) : null;
                 return result_object;
             }
             set
@@ -3943,7 +3945,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_located_event_args_get_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -3984,7 +3986,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_anchor_located_event_args_get_watcher(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -4071,7 +4073,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 IDictionary_String_String result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_get_app_properties(this.handle, out result_handle));
-                result_object = new IDictionary_String_String(result_handle, transfer: true);
+                result_object = new IDictionary_String_String(result_handle, transfer:true);
                 return result_object;
             }
         }
@@ -4284,7 +4286,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionConfiguration result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_configuration(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.SessionConfiguration(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.SessionConfiguration(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -4299,7 +4301,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorSessionDiagnostics result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_diagnostics(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorSessionDiagnostics(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorSessionDiagnostics(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -4345,7 +4347,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             TokenRequiredDelegate handler = (instance == null) ? null : instance._TokenRequired;
-            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer: false));
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.TokenRequiredEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static TokenRequiredDelegateNative TokenRequiredStaticHandlerDelegate = TokenRequiredStaticHandler;
@@ -4370,7 +4372,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             AnchorLocatedDelegate handler = (instance == null) ? null : instance._AnchorLocated;
-            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer: false));
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.AnchorLocatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static AnchorLocatedDelegateNative AnchorLocatedStaticHandlerDelegate = AnchorLocatedStaticHandler;
@@ -4395,7 +4397,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             LocateAnchorsCompletedDelegate handler = (instance == null) ? null : instance._LocateAnchorsCompleted;
-            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer: false));
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.LocateAnchorsCompletedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static LocateAnchorsCompletedDelegateNative LocateAnchorsCompletedStaticHandlerDelegate = LocateAnchorsCompletedStaticHandler;
@@ -4420,7 +4422,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionUpdatedDelegate handler = (instance == null) ? null : instance._SessionUpdated;
-            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer: false));
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionUpdatedEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionUpdatedDelegateNative SessionUpdatedStaticHandlerDelegate = SessionUpdatedStaticHandler;
@@ -4445,7 +4447,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             SessionErrorDelegate handler = (instance == null) ? null : instance._Error;
-            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer: false));
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.SessionErrorEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static SessionErrorDelegateNative ErrorStaticHandlerDelegate = ErrorStaticHandler;
@@ -4470,7 +4472,7 @@ namespace Microsoft.Azure.SpatialAnchors
         {
             var instance = CookieTracker<CloudSpatialAnchorSession>.Lookup(cookie);
             OnLogDebugDelegate handler = (instance == null) ? null : instance._OnLogDebug;
-            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer: false));
+            if (handler != null) handler(instance, new Microsoft.Azure.SpatialAnchors.OnLogDebugEventArgs(args, transfer:false));
         }
         /// <summary>This static delegate instance keeps callbacks alive.</summary>
         private static OnLogDebugDelegateNative OnLogDebugStaticHandlerDelegate = OnLogDebugStaticHandler;
@@ -4552,7 +4554,7 @@ namespace Microsoft.Azure.SpatialAnchors
             IntPtr result_handle;
             Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_create_watcher(this.handle, criteria.handle, out result_handle));
-            result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer: true) : null;
+            result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
             return result_object;
         }
 
@@ -4569,7 +4571,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_anchor_properties_async(this.handle, identifier, out result_handle));
-                result_object = new CloudSpatialAnchor(result_handle, transfer: true);
+                result_object = new CloudSpatialAnchor(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -4585,7 +4587,7 @@ namespace Microsoft.Azure.SpatialAnchors
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_active_watchers_count(this.handle, out result_count));
             result_array = new IntPtr[result_count];
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_active_watchers_items(this.handle, result_array, ref result_count));
-            result = result_array.Take(result_count).Select(handle => new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(handle, transfer: true)).ToList().AsReadOnly();
+            result = result_array.Take(result_count).Select(handle => new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(handle, transfer:true)).ToList().AsReadOnly();
             return result;
         }
 
@@ -4641,7 +4643,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionStatus result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_cloud_spatial_anchor_session_get_session_status_async(this.handle, out result_handle));
-                result_object = new SessionStatus(result_handle, transfer: true);
+                result_object = new SessionStatus(result_handle, transfer:true);
                 return result_object;
             });
         }
@@ -4758,7 +4760,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_locate_anchors_completed_event_args_get_watcher(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -4798,7 +4800,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_near_anchor_criteria_get_source_anchor(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchor(result_handle, transfer:true) : null;
                 return result_object;
             }
             set
@@ -5025,7 +5027,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_session_error_event_args_get_watcher(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorWatcher(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -5155,7 +5157,7 @@ namespace Microsoft.Azure.SpatialAnchors
                 IntPtr result_handle;
                 Microsoft.Azure.SpatialAnchors.SessionStatus result_object;
                 NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_session_updated_event_args_get_status(this.handle, out result_handle));
-                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.SessionStatus(result_handle, transfer: true) : null;
+                result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.SessionStatus(result_handle, transfer:true) : null;
                 return result_object;
             }
         }
@@ -5221,7 +5223,7 @@ namespace Microsoft.Azure.SpatialAnchors
             IntPtr result_handle;
             Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorSessionDeferral result_object;
             NativeLibraryHelpers.CheckStatus(this.handle, NativeLibrary.ssc_token_required_event_args_get_deferral(this.handle, out result_handle));
-            result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorSessionDeferral(result_handle, transfer: true) : null;
+            result_object = (result_handle != IntPtr.Zero) ? new Microsoft.Azure.SpatialAnchors.CloudSpatialAnchorSessionDeferral(result_handle, transfer:true) : null;
             return result_object;
         }
 
