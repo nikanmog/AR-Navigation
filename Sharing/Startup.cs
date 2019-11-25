@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 // Comment out the next line to use CosmosDb instead of InMemory for the anchor cache.
-#define INMEMORY_DEMO
+//#define INMEMORY_DEMO
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
