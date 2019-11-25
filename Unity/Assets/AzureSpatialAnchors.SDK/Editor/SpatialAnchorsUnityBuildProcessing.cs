@@ -336,30 +336,30 @@ which is required for package restoration to work. If the file has been moved, y
         Debug.Log($"Creating Spatial Anchors packages.config file: '{packagesConfigFilePath}'.");
 
         using (FileStream fileStream = new FileStream(packagesConfigFilePath, FileMode.Create))
-            using (XmlWriter xmlWriter = XmlWriter.Create(fileStream, new XmlWriterSettings { Encoding = System.Text.Encoding.UTF8, Indent = true }))
-            {
-                xmlWriter.WriteStartDocument();
+        using (XmlWriter xmlWriter = XmlWriter.Create(fileStream, new XmlWriterSettings { Encoding = System.Text.Encoding.UTF8, Indent = true }))
+        {
+            xmlWriter.WriteStartDocument();
 
-                // Start packages element
-                xmlWriter.WriteStartElement("packages");
+            // Start packages element
+            xmlWriter.WriteStartElement("packages");
 
-                xmlWriter.WriteStartElement("package");
-                xmlWriter.WriteAttributeString("id", AzureSpatialAnchorsPackage);
-                xmlWriter.WriteAttributeString("version", projectInfo.SpatialAnchorsSdkVersion);
-                xmlWriter.WriteAttributeString("targetFramework", "native");
-                xmlWriter.WriteEndElement();
+            xmlWriter.WriteStartElement("package");
+            xmlWriter.WriteAttributeString("id", AzureSpatialAnchorsPackage);
+            xmlWriter.WriteAttributeString("version", projectInfo.SpatialAnchorsSdkVersion);
+            xmlWriter.WriteAttributeString("targetFramework", "native");
+            xmlWriter.WriteEndElement();
 
-                xmlWriter.WriteStartElement("package");
-                xmlWriter.WriteAttributeString("id", AzureSpatialAnchorsRedistPackage);
-                xmlWriter.WriteAttributeString("version", projectInfo.SpatialAnchorsSdkVersion);
-                xmlWriter.WriteAttributeString("targetFramework", "native");
-                xmlWriter.WriteEndElement();
+            xmlWriter.WriteStartElement("package");
+            xmlWriter.WriteAttributeString("id", AzureSpatialAnchorsRedistPackage);
+            xmlWriter.WriteAttributeString("version", projectInfo.SpatialAnchorsSdkVersion);
+            xmlWriter.WriteAttributeString("targetFramework", "native");
+            xmlWriter.WriteEndElement();
 
-                // End packages element
-                xmlWriter.WriteEndElement();
+            // End packages element
+            xmlWriter.WriteEndElement();
 
-                xmlWriter.WriteEndDocument();
-            }
+            xmlWriter.WriteEndDocument();
+        }
 
         return true;
     }

@@ -1,14 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.XR.ARSubsystems;
-using System.Runtime.InteropServices;
 #if UNITY_ANDROID || UNITY_IOS
 using UnityEngine.XR.ARFoundation;
 using System.IO;
@@ -20,7 +15,6 @@ using Microsoft.Azure.SpatialAnchors.Unity.IOS;
 using Microsoft.Azure.SpatialAnchors.Unity.Android;
 #endif
 #if UNITY_WSA || WINDOWS_UWP
-using UnityEngine.XR.WSA;
 #endif
 
 namespace Microsoft.Azure.SpatialAnchors.Unity
@@ -645,8 +639,19 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
 #if UNITY_ANDROID || UNITY_IOS
             arReferencePointManager.referencePointsChanged += ARReferencePointManager_referencePointsChanged;
 #endif
+
+/* Unmerged change from project 'Assembly-CSharp.Player'
+Before:
         }
         
+        /// <summary>
+After:
+        }
+
+        /// <summary>
+*/
+        }
+
         /// <summary>
         /// Update is called once per frame
         /// </summary>
@@ -656,9 +661,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
             ProcessPendingEventArgs();
 #endif
         }
-#endregion // Unity Overrides
+        #endregion // Unity Overrides
 
-#region Public Methods
+        #region Public Methods
         /// <summary>
         /// Creates a new session if one does not exist.
         /// </summary>
@@ -723,7 +728,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
 
             // Configure logging
             session.LogLevel = logLevel;
-           
+
             // Configure authentication
             if (authenticationMode == AuthenticationMode.ApiKey)
             {
@@ -932,7 +937,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
 
             // Start the session
             session.Start();
-            
+
             // It's started
             isSessionStarted = true;
 
@@ -981,9 +986,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
             // Notify
             OnSessionStopped();
         }
-#endregion // Public Methods
+        #endregion // Public Methods
 
-#region Public Properties
+        #region Public Properties
         /// <summary>
         /// Gets or sets the method used for authentication.
         /// The default is <see cref="AuthenticationMode.ApiKey">ApiKey</see>.
@@ -1096,9 +1101,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
         /// Gets or sets the Tenant ID to use when authenticating via Azure Active Directory.
         /// </summary>
         public string TenantId { get { return tenantId; } set { tenantId = value; } }
-#endregion // Public Properties
+        #endregion // Public Properties
 
-#region Public Events
+        #region Public Events
         /// <summary>
         /// Raised when the <see cref="Session"/> <see cref="CloudSpatialAnchorSession.AnchorLocated">AnchorLocated</see> event is fired.
         /// </summary>
@@ -1199,6 +1204,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
         /// the currently active session.
         /// </remarks>
         public event OnLogDebugDelegate LogDebug;
-#endregion // Public Events
+        #endregion // Public Events
     }
 }

@@ -2,10 +2,7 @@
 // Licensed under the MIT license.
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
-using System.Runtime.InteropServices;
-using UnityEngine.XR.ARFoundation;
 #if UNITY_IOS
 using Microsoft.Azure.SpatialAnchors.Unity.IOS;
 using PlatformKey = System.String;
@@ -17,7 +14,6 @@ using PlatformKey = System.IntPtr;
 using Microsoft.Azure.SpatialAnchors.Unity.ARFoundation;
 using NativeAnchor = Microsoft.Azure.SpatialAnchors.Unity.ARFoundation.UnityARFoundationAnchorComponent;
 #elif WINDOWS_UWP || UNITY_WSA
-using UnityEngine.XR.WSA;
 using NativeAnchor = UnityEngine.XR.WSA.WorldAnchor;
 #else
 using NativeAnchor = UnityEngine.MonoBehaviour;
@@ -106,7 +102,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
             // Placeholder
             NativeAnchor nativeAnchor = null;
 
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             // On UWP we can just update the pointer on any existing WorldAnchor.
             // Doing so will also automatically update the objects pose.
 
@@ -116,7 +112,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
             // Update the World Anchor to use the cloud-based native anchor
             nativeAnchor.SetNativeSpatialAnchorPtr(cloudAnchor.LocalAnchor);
 
-            #elif UNITY_IOS || UNITY_ANDROID
+#elif UNITY_IOS || UNITY_ANDROID
 
             // On iOS and Android we need to remove any existing native anchor,
             // move the object to the new pose, and then re-apply the native anchor.
@@ -134,7 +130,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
             // Add the native anchor back on
             nativeAnchor = gameObject.CreateNativeAnchor();
 
-            #else
+#else
 
             throw new PlatformNotSupportedException("Unable to apply the cloud anchor. The platform is not supported.");
 

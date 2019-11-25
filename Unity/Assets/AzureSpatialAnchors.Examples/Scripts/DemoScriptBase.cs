@@ -305,13 +305,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         protected override void OnGazeInteraction()
         {
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             // HoloLens gaze interaction
             if (IsPlacingObject())
             {
                 base.OnGazeInteraction();
             }
-            #endif
+#endif
         }
 
         /// <summary>
@@ -323,10 +323,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.OnGazeObjectInteraction(hitPoint, hitNormal);
 
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hitNormal);
             SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
-            #endif
+#endif
         }
 
         /// <summary>
@@ -358,10 +358,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <remarks>Currently only called for HoloLens.</remarks>
         protected override void OnSelectInteraction()
         {
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             // On HoloLens, we just advance the demo.
             UnityDispatcher.InvokeOnAppThread(() => advanceDemoTask = AdvanceDemoAsync());
-            #endif
+#endif
 
             base.OnSelectInteraction();
         }

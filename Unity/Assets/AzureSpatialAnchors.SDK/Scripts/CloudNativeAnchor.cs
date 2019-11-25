@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-using Microsoft.Azure.SpatialAnchors;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
