@@ -368,7 +368,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else
             {
-                await AdvanceDemoAsync();
+                await AdvanceDemoAsync(); /// To-Do Modify this to reduce menu complexity
             }
         }
 
