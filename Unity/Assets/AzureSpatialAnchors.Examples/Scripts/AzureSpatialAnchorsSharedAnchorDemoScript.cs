@@ -39,9 +39,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         private readonly Dictionary<AppState, DemoStepParams> stateParams = new Dictionary<AppState, DemoStepParams>
         {
-            { AppState.DemoStepChooseFlow,new DemoStepParams() { StepMessage = "Next: Choose your Demo Flow", StepColor = Color.clear }},
+            { AppState.DemoStepChooseFlow,new DemoStepParams() { StepMessage = "Welcome to Microsoft Germany!", StepColor = Color.clear }},
             { AppState.DemoStepInputAnchorNumber,new DemoStepParams() { StepMessage = "Next: Input anchor number", StepColor = Color.clear }},
-            { AppState.DemoStepCreateSession,new DemoStepParams() { StepMessage = "Next: Create CloudSpatialAnchorSession", StepColor = Color.clear }},
+            { AppState.DemoStepCreateSession,new DemoStepParams() { StepMessage = "Add object to your environment", StepColor = Color.clear }},
             { AppState.DemoStepConfigSession,new DemoStepParams() { StepMessage = "Next: Configure CloudSpatialAnchorSession", StepColor = Color.clear }},
             { AppState.DemoStepStartSession,new DemoStepParams() { StepMessage = "Next: Start CloudSpatialAnchorSession", StepColor = Color.clear }},
             { AppState.DemoStepCreateLocalAnchor,new DemoStepParams() { StepMessage = "Tap a surface to add the local anchor.", StepColor = Color.blue }},
@@ -406,14 +406,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentAppState = AppState.DemoStepCreateLocalAnchor;
 
                     break;
-                case AppState.DemoStepConfigSession:
-                    
-                    currentAppState = AppState.DemoStepStartSession;
-                    break;
-                case AppState.DemoStepStartSession:
-                    
-                    currentAppState = AppState.DemoStepCreateLocalAnchor;
-                    break;
+
                 case AppState.DemoStepCreateLocalAnchor:
                     if (spawnedObject != null)
                     {
