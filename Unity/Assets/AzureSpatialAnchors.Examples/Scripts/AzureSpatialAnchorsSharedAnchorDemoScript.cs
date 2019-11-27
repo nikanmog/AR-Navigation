@@ -90,10 +90,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 {
                     Debug.LogFormat("State from {0} to {1}", _currentAppState, value);
                     _currentAppState = value;
-                    if (spawnedObjectMat != null)
-                    {
-                        spawnedObjectMat.color = stateParams[_currentAppState].StepColor;
-                    }
+                    //if (spawnedObjectMat != null)
+                    //{
+                    //   spawnedObjectMat.color = stateParams[_currentAppState].StepColor;
+                    //}
 
                     feedbackBox.text = stateParams[_currentAppState].StepMessage;
                     EnableCorrectUIControls();
@@ -234,7 +234,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else if (dataToAttach != -1)
             {
-                tm.text = $"Anchor Number:{dataToAttach}";
+                tm.text = $"Anchor:{dataToAttach}";
             }
             else
             {
@@ -294,6 +294,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             if (_currentDemoFlow == DemoFlow.CreateFlow)
             {
+
+
+
+
+
+
                 await AdvanceCreateFlowDemoAsync();
             }
             else if (_currentDemoFlow == DemoFlow.LocateFlow)
@@ -394,14 +400,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 case AppState.DemoStepCreateSession:
                     currentCloudAnchor = null;
-                    currentAppState = AppState.DemoStepConfigSession;
+                    //currentAppState = AppState.DemoStepConfigSession;
+                    ConfigureSession();
+                    await CloudManager.StartSessionAsync();
+                    currentAppState = AppState.DemoStepCreateLocalAnchor;
+
                     break;
                 case AppState.DemoStepConfigSession:
-                    ConfigureSession();
+                    
                     currentAppState = AppState.DemoStepStartSession;
                     break;
                 case AppState.DemoStepStartSession:
-                    await CloudManager.StartSessionAsync();
+                    
                     currentAppState = AppState.DemoStepCreateLocalAnchor;
                     break;
                 case AppState.DemoStepCreateLocalAnchor:
