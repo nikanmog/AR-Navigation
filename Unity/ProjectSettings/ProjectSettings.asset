@@ -820,7 +820,7 @@ PlayerSettings:
   metroCertificatePassword: 
   metroCertificateSubject: Microsoft
   metroCertificateIssuer: Microsoft
-  metroCertificateNotAfter: 80f2c01c87b4d601
+  metroCertificateNotAfter: 80a8e117a7c2d601
   metroApplicationDescription: AR-Navigation
   wsaImages: {}
   metroTileShortName: AR-Navigation

@@ -662,7 +662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05d7d02a6af8dd48aefdd862a1556e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anchoredObjectPrefab: {fileID: -927199367670048503, guid: c0078d4244e9c88408b36ee335148280,
+  anchoredObjectPrefab: {fileID: 1147623660883556, guid: e593bfccf03b6444da88c7591f906ba8,
     type: 3}
   cloudManager: {fileID: 294771742}
   baseSharingUrl: 
@@ -2798,7 +2798,7 @@ Transform:
   - {fileID: 1325473755}
   - {fileID: 1993652240}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1899559022
 GameObject:
@@ -2864,7 +2864,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1993652239
 PrefabInstance:
@@ -3050,7 +3050,7 @@ PrefabInstance:
     - target: {fileID: 5588944806769693615, guid: d349bcbd79ed7d34e82621f4659db864,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5588944806769693615, guid: d349bcbd79ed7d34e82621f4659db864,
         type: 3}
