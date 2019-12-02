@@ -50,9 +50,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             new Vector3(0,0,0)
         };
         private readonly int numToMake = 8;
-
+        #if !UNITY_EDITOR
+                public AnchorExchanger anchorExchanger = new AnchorExchanger();
+        #endif
         private AppState _currentAppState = AppState.Placing;
-
+        private readonly List<string> localAnchorIds = new List<string>();
+        private string baseSharingUrl = "";
         AppState currentAppState
         {
             get
@@ -100,6 +103,40 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 return;
             }
+
+
+
+            SpatialAnchorSamplesConfig samplesConfig = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig");
+            if (string.IsNullOrWhiteSpace(BaseSharingUrl) && samplesConfig != null)
+            {
+                BaseSharingUrl = samplesConfig.BaseSharingURL;
+            }
+
+            if (string.IsNullOrEmpty(BaseSharingUrl))
+            {
+                feedbackBox.text = $"Need to set {nameof(BaseSharingUrl)}.";
+                XRUXPickerForSharedAnchorDemo.Instance.GetDemoButtons()[1].gameObject.SetActive(false);
+                XRUXPickerForSharedAnchorDemo.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
+                XRUXPickerForSharedAnchorDemo.Instance.GetDemoInputField().gameObject.SetActive(false);
+                return;
+            }
+            else
+            {
+                Uri result;
+                if (!Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
+                {
+                    feedbackBox.text = $"{nameof(BaseSharingUrl)} is not a valid url";
+                    return;
+                }
+                else
+                {
+                    BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
+                }
+            }
+
+            #if !UNITY_EDITOR
+                        anchorExchanger.WatchKeys(BaseSharingUrl);
+            #endif
 
             feedbackBox.text = "Find nearby demo.  First, we need to place a few anchors. Tap somewhere to place the first one";
 
@@ -322,6 +359,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             anchorIds.Add(currentCloudAnchor.Identifier);
 
+            long anchorNumber = -1;
+
+            localAnchorIds.Add(currentCloudAnchor.Identifier);
+
+            #if !UNITY_EDITOR
+                        anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
+            #endif
+
+
+
+
+
             // Sanity check that the object is still where we expect
             Pose anchorPose = Pose.identity;
 
@@ -352,6 +401,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.OnSaveCloudAnchorFailed(exception);
         }
-
+        public string BaseSharingUrl { get => baseSharingUrl; set => baseSharingUrl = value; }
     }
 }

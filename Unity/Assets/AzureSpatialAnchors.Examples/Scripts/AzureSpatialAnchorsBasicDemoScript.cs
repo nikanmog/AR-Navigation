@@ -9,6 +9,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class AzureSpatialAnchorsBasicDemoScript : DemoScriptBase
     {
+
         internal enum AppState
         {
             DemoStepCreateSession = 0,
@@ -62,7 +63,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     _currentAppState = value;
                     if (spawnedObjectMat != null)
                     {
-                        spawnedObjectMat.color = stateParams[_currentAppState].StepColor;
                     }
 
                     if (!isErrorActive)
@@ -89,6 +89,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 return;
             }
+
+
+
+
+
+
+
+
+
+
+
             feedbackBox.text = stateParams[currentAppState].StepMessage;
 
             Debug.Log("Azure Spatial Anchors Demo script started");
@@ -132,7 +143,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
                 }
                 rat += (Mathf.Min(createProgress, 1) * 0.9f);
-                spawnedObjectMat.color = GetStepColor() * rat;
             }
         }
 
@@ -256,5 +266,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             SetAnchorIdsToLocate(anchorsToFind);
         }
+
     }
 }

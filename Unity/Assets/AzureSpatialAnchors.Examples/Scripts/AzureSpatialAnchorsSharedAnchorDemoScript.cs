@@ -204,7 +204,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
                 }
                 rat += (Mathf.Min(createProgress, 1) * 0.9f);
-                spawnedObjectMat.color = stateParams[currentAppState].StepColor * rat;
+                //spawnedObjectMat.color = stateParams[currentAppState].StepColor * rat;
             }
         }
 
