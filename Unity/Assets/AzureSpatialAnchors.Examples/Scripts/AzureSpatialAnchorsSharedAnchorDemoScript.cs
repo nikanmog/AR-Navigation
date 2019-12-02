@@ -234,7 +234,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else if (dataToAttach != -1)
             {
-                tm.text = $"Anchor:{dataToAttach}";
+                tm.text = $"{dataToAttach}";
             }
             else
             {
@@ -294,9 +294,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             if (_currentDemoFlow == DemoFlow.CreateFlow)
             {
-
-
-
 
 
 
@@ -400,7 +397,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 case AppState.DemoStepCreateSession:
                     currentCloudAnchor = null;
-                    //currentAppState = AppState.DemoStepConfigSession;
                     ConfigureSession();
                     await CloudManager.StartSessionAsync();
                     currentAppState = AppState.DemoStepCreateLocalAnchor;

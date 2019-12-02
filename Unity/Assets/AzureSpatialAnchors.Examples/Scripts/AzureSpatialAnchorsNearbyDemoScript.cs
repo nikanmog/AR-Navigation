@@ -49,7 +49,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             new Vector3(0,.1f,0),
             new Vector3(0,0,0)
         };
-        private readonly int numToMake = 3;
+        private readonly int numToMake = 8;
 
         private AppState _currentAppState = AppState.Placing;
 
@@ -236,8 +236,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
 
             #if WINDOWS_UWP || UNITY_WSA
-            if (currentCloudAnchor != null
-                    && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
+            if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
             {
                 spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
             }
@@ -260,17 +259,55 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     }
                     break;
                 case AppState.ReadyToGraph:
-                    await DoGraphingPassAsync();
+                    SetGraphEnabled(false);
+                    await CloudManager.ResetSessionAsync();
+                    locatedCount = 0;
+                    SetAnchorIdsToLocate(anchorIds);
+                    SetNearbyAnchor(null, 10, numToMake);
+                    await CloudManager.StartSessionAsync();
+                    currentWatcher = CreateWatcher();
+                    currentAppState = AppState.Graphing; //do the recall..
                     break;
                 case AppState.ReadyToSearch:
-                    await DoSearchingPassAsync();
+                    await CloudManager.ResetSessionAsync();
+                    await CloudManager.StartSessionAsync();
+                    SetGraphEnabled(false);
+                    IEnumerable<string> anchorsToFind = new[] { anchorIds[0] };
+                    SetAnchorIdsToLocate(anchorsToFind);
+                    locatedCount = 0;
+                    dueDate = DateTime.Now.AddSeconds(30);
+                    currentWatcher = CreateWatcher();
+                    currentAppState = AppState.Searching;
                     break;
                 case AppState.ReadyToNeighborQuery:
-                    await DoNeighboringPassAsync();
+                    await CloudManager.StartSessionAsync();
+                    SetGraphEnabled(true);
+                    ResetAnchorIdsToLocate();
+                    SetNearbyAnchor(currentCloudAnchor, 10, numToMake);
+                    locatedCount = 0;
+                    dueDate = DateTime.Now.AddSeconds(30);
+                    currentWatcher = CreateWatcher();
+                    currentAppState = AppState.Neighboring;
                     break;
                 case AppState.Done:
                     await CloudManager.ResetSessionAsync();
-                    CleanupObjectsBetweenPasses();
+                    foreach (GameObject go in allSpawnedObjects)
+                    {
+                        Destroy(go);
+                    }
+                    allSpawnedObjects.Clear();
+
+                    foreach (Material m in allSpawnedMaterials)
+                    {
+                        Destroy(m);
+                    }
+                    allSpawnedMaterials.Clear();
+
+                    currentCloudAnchor = null;
+                    spawnedObject = null;
+                    spawnedObjectMat = null;
+                    spawnedObjectsPerAppState.Clear();
+                    anchorIds.Clear();
                     currentAppState = AppState.Placing;
                     feedbackBox.text = $"Place an object. {allSpawnedObjects.Count}/{numToMake} ";
                     break;
@@ -316,62 +353,5 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             base.OnSaveCloudAnchorFailed(exception);
         }
 
-        private async Task DoGraphingPassAsync()
-        {
-            SetGraphEnabled(false);
-            await CloudManager.ResetSessionAsync();
-            locatedCount = 0;
-            SetAnchorIdsToLocate(anchorIds);
-            SetNearbyAnchor(null, 10, numToMake);
-            await CloudManager.StartSessionAsync();
-            currentWatcher = CreateWatcher();
-            currentAppState = AppState.Graphing; //do the recall..
-        }
-
-        private async Task DoSearchingPassAsync()
-        {
-            await CloudManager.ResetSessionAsync();
-            await CloudManager.StartSessionAsync();
-            SetGraphEnabled(false);
-            IEnumerable<string> anchorsToFind = new[] { anchorIds[0] };
-            SetAnchorIdsToLocate(anchorsToFind);
-            locatedCount = 0;
-            dueDate = DateTime.Now.AddSeconds(30);
-            currentWatcher = CreateWatcher();
-            currentAppState = AppState.Searching;
-        }
-
-        private async Task DoNeighboringPassAsync()
-        {
-            await CloudManager.StartSessionAsync();
-            SetGraphEnabled(true);
-            ResetAnchorIdsToLocate();
-            SetNearbyAnchor(currentCloudAnchor, 10, numToMake);
-            locatedCount = 0; 
-            dueDate = DateTime.Now.AddSeconds(30);
-            currentWatcher = CreateWatcher();
-            currentAppState = AppState.Neighboring;
-        }
-
-        private void CleanupObjectsBetweenPasses()
-        {
-            foreach (GameObject go in allSpawnedObjects)
-            {
-                Destroy(go);
-            }
-            allSpawnedObjects.Clear();
-
-            foreach (Material m in allSpawnedMaterials)
-            {
-                Destroy(m);
-            }
-            allSpawnedMaterials.Clear();
-
-            currentCloudAnchor = null;
-            spawnedObject = null;
-            spawnedObjectMat = null;
-            spawnedObjectsPerAppState.Clear();
-            anchorIds.Clear();
-        }
     }
 }
