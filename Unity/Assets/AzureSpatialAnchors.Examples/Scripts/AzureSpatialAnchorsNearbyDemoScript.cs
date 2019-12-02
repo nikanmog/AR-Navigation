@@ -10,6 +10,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class AzureSpatialAnchorsNearbyDemoScript : DemoScriptBase
     {
+        //App States
         internal enum AppState
         {
             Placing = 0,
@@ -23,39 +24,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Done,
             ModeCount
         }
-
-        private readonly Color[] colors =
-        {
-            Color.white,
-            Color.magenta,
-            Color.magenta,
-            Color.yellow,
-            Color.magenta,
-            Color.cyan,
-            Color.magenta,
-            Color.green,
-            Color.grey
-        };
-
-        private readonly Vector3[] scaleMods =
-        {
-            new Vector3(0,0,0),
-            new Vector3(0,0,0),
-            new Vector3(0,0,0),
-            new Vector3(.1f,0,0),
-            new Vector3(0,0,0),
-            new Vector3(0,0,.1f),
-            new Vector3(0,0,0),
-            new Vector3(0,.1f,0),
-            new Vector3(0,0,0)
-        };
-        private readonly int numToMake = 8;
-        #if !UNITY_EDITOR
-                public AnchorExchanger anchorExchanger = new AnchorExchanger();
-        #endif
-        private AppState _currentAppState = AppState.Placing;
-        private readonly List<string> localAnchorIds = new List<string>();
-        private string baseSharingUrl = "";
         AppState currentAppState
         {
             get
@@ -72,9 +40,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
         }
+        private AppState _currentAppState = AppState.Placing;
+        // Cosmos Connection
+        public string BaseSharingUrl { 
+            get => baseSharingUrl; 
+            set => baseSharingUrl = value; 
+        }
+        private string baseSharingUrl = "";
+#if !UNITY_EDITOR
+            public AnchorExchanger anchorExchanger = new AnchorExchanger();
+#endif
+        private string _anchorKeyToFind = null;
+        private readonly int numToMake = 8;
 
         readonly List<string> anchorIds = new List<string>();
         readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
+        private readonly List<GameObject> allSpawnedObjects = new List<GameObject>();
+        private readonly List<Material> allSpawnedMaterials = new List<Material>();
 
         Dictionary<string, GameObject> spawnedObjectsInCurrentAppState
         {
@@ -95,16 +77,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Start()
         {
-            Debug.Log(">>Azure Spatial Anchors Demo Script Start");
-
             base.Start();
 
             if (!SanityCheckAccessConfiguration())
             {
                 return;
             }
-
-
 
             SpatialAnchorSamplesConfig samplesConfig = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig");
             if (string.IsNullOrWhiteSpace(BaseSharingUrl) && samplesConfig != null)
@@ -134,13 +112,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
 
-            #if !UNITY_EDITOR
-                        anchorExchanger.WatchKeys(BaseSharingUrl);
-            #endif
+#if !UNITY_EDITOR
+                anchorExchanger.WatchKeys(BaseSharingUrl);
+#endif
 
-            feedbackBox.text = "Find nearby demo.  First, we need to place a few anchors. Tap somewhere to place the first one";
 
-            Debug.Log("Azure Spatial Anchors Demo script started");
+            if (_anchorKeyToFind != null)
+            {
+                currentAppState = AppState.ReadyToGraph;
+
+            }
+            feedbackBox.text = "Welcome to Microsoft";
+
         }
 
         /// <summary>
@@ -150,12 +133,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.Update();
 
-            HandleCurrentAppState();
-        }
 
-        private void HandleCurrentAppState()
-        {
-            int timeLeft = (int)(dueDate - DateTime.Now).TotalSeconds;
             switch (currentAppState)
             {
                 case AppState.ReadyToGraph:
@@ -168,26 +146,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     feedbackBox.text = "Next: Tap to start looking for just the first anchor we placed.";
                     break;
                 case AppState.Searching:
-                    feedbackBox.text = $"Looking for the first anchor you made. Give up in {timeLeft}";
-                    if (timeLeft < 0)
-                    {
-                        Debug.Log("Out of time");
-                        // Restart the demo..
-                        feedbackBox.text = "Failed to find the first anchor.  Try again.";
-                        currentAppState = AppState.Done;
-                    }
+                    feedbackBox.text = $"Looking for the first anchor you made.";
+ 
                     break;
                 case AppState.ReadyToNeighborQuery:
                     feedbackBox.text = "Next: Tap to start looking for anchors nearby the first anchor we placed.";
                     break;
                 case AppState.Neighboring:
                     // We should find all anchors except for the anchor we are using as the source anchor.
-                    feedbackBox.text = $"Looking for anchors nearby the first anchor. {locatedCount}/{numToMake - 1} {timeLeft}";
-                    if (timeLeft < 0)
-                    {
-                        feedbackBox.text = "Failed to find all the neighbors.  Try again.";
-                        currentAppState = AppState.Done;
-                    }
+                    feedbackBox.text = $"Looking for anchors nearby the first anchor. {locatedCount}/{numToMake - 1}";
+
                     if (locatedCount == numToMake - 1)
                     {
                         feedbackBox.text = "Found them all!";
@@ -195,16 +163,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     }
                     break;
             }
-        }
-
-        protected override bool IsPlacingObject()
-        {
-            return currentAppState == AppState.Placing;
-        }
-
-        protected override Color GetStepColor()
-        {
-            return colors[(int)currentAppState];
         }
 
         private int locatedCount = 0;
@@ -228,7 +186,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                     SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
 
-                    spawnedObject.transform.localScale += scaleMods[(int)currentAppState];
                     spawnedObject = null;
 
                     if (currentAppState == AppState.Graphing)
@@ -245,10 +202,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 });
             }
         }
-
-        private DateTime dueDate = DateTime.Now;
-        private readonly List<GameObject> allSpawnedObjects = new List<GameObject>();
-        private readonly List<Material> allSpawnedMaterials = new List<Material>();
 
         protected override void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
         {
@@ -279,9 +232,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             #endif
         }
-
+        private bool startup = true;
         public async override Task AdvanceDemoAsync()
         {
+            if (startup == true)
+            {
+            #if !UNITY_EDITOR
+                            _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1); 
+            #endif
+                startup = false;
+            }
             switch (currentAppState)
             {
                 case AppState.Placing:
@@ -299,6 +259,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     SetGraphEnabled(false);
                     await CloudManager.ResetSessionAsync();
                     locatedCount = 0;
+                    if (anchorIds == null)
+                    {
+                        anchorIds.Add("1");
+                    }
+
                     SetAnchorIdsToLocate(anchorIds);
                     SetNearbyAnchor(null, 10, numToMake);
                     await CloudManager.StartSessionAsync();
@@ -312,7 +277,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     IEnumerable<string> anchorsToFind = new[] { anchorIds[0] };
                     SetAnchorIdsToLocate(anchorsToFind);
                     locatedCount = 0;
-                    dueDate = DateTime.Now.AddSeconds(30);
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Searching;
                     break;
@@ -322,7 +286,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     ResetAnchorIdsToLocate();
                     SetNearbyAnchor(currentCloudAnchor, 10, numToMake);
                     locatedCount = 0;
-                    dueDate = DateTime.Now.AddSeconds(30);
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Neighboring;
                     break;
@@ -361,7 +324,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             long anchorNumber = -1;
 
-            localAnchorIds.Add(currentCloudAnchor.Identifier);
+            anchorIds.Add(currentCloudAnchor.Identifier);
 
             #if !UNITY_EDITOR
                         anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
@@ -397,10 +360,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
+        protected override bool IsPlacingObject()
+        {
+            return currentAppState == AppState.Placing;
+        }
         protected override void OnSaveCloudAnchorFailed(Exception exception)
         {
             base.OnSaveCloudAnchorFailed(exception);
         }
-        public string BaseSharingUrl { get => baseSharingUrl; set => baseSharingUrl = value; }
+        protected override Color GetStepColor()
+        {
+            return Color.red;
+        }
     }
 }
