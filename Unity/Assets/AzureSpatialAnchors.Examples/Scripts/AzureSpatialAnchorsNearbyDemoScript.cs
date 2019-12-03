@@ -116,14 +116,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 anchorExchanger.WatchKeys(BaseSharingUrl);
 #endif
 
-
-            if (_anchorKeyToFind != null)
-            {
-                currentAppState = AppState.ReadyToGraph;
-
-            }
-            feedbackBox.text = "Welcome to Microsoft";
-
         }
 
         /// <summary>
@@ -143,10 +135,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     feedbackBox.text = $"Making sure we can find the anchors we just made. ({locatedCount}/{numToMake})";
                     break;
                 case AppState.ReadyToSearch:
-                    feedbackBox.text = "Next: Tap to start looking for just the first anchor we placed.";
+                    //feedbackBox.text = "Next: Tap to start looking for just the first anchor we placed.";
                     break;
                 case AppState.Searching:
-                    feedbackBox.text = $"Looking for the first anchor you made.";
+                    feedbackBox.text = $"Looking for the first anchor...";
  
                     break;
                 case AppState.ReadyToNeighborQuery:
@@ -240,7 +232,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             #if !UNITY_EDITOR
                             _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1); 
             #endif
+                if (_anchorKeyToFind != null)
+                {
+                    currentAppState = AppState.ReadyToSearch;
+                    anchorIds.Add(_anchorKeyToFind);
+                }
                 startup = false;
+                feedbackBox.text = "Welcome to Microsoft";
             }
             switch (currentAppState)
             {
@@ -259,11 +257,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     SetGraphEnabled(false);
                     await CloudManager.ResetSessionAsync();
                     locatedCount = 0;
-                    if (anchorIds == null)
-                    {
-                        anchorIds.Add("1");
-                    }
-
                     SetAnchorIdsToLocate(anchorIds);
                     SetNearbyAnchor(null, 10, numToMake);
                     await CloudManager.StartSessionAsync();
@@ -271,13 +264,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentAppState = AppState.Graphing; //do the recall..
                     break;
                 case AppState.ReadyToSearch:
+                    feedbackBox.text = "1";
+                    if (!CloudManager.IsSessionStarted)
+                    {
+                        await CloudManager.StartSessionAsync();
+                    }
+                    feedbackBox.text = "2";
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
+                    feedbackBox.text = "3";
                     SetGraphEnabled(false);
+                    feedbackBox.text = "4";
                     IEnumerable<string> anchorsToFind = new[] { anchorIds[0] };
                     SetAnchorIdsToLocate(anchorsToFind);
                     locatedCount = 0;
+                    feedbackBox.text = "5";
                     currentWatcher = CreateWatcher();
+                    feedbackBox.text = "6";
                     currentAppState = AppState.Searching;
                     break;
                 case AppState.ReadyToNeighborQuery:
@@ -290,6 +293,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentAppState = AppState.Neighboring;
                     break;
                 case AppState.Done:
+                    /*
                     await CloudManager.ResetSessionAsync();
                     foreach (GameObject go in allSpawnedObjects)
                     {
@@ -310,7 +314,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     anchorIds.Clear();
                     currentAppState = AppState.Placing;
                     feedbackBox.text = $"Place an object. {allSpawnedObjects.Count}/{numToMake} ";
+                    */
                     break;
+                    
             }
         }
 
@@ -329,10 +335,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             #if !UNITY_EDITOR
                         anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
             #endif
-
-
-
-
 
             // Sanity check that the object is still where we expect
             Pose anchorPose = Pose.identity;
