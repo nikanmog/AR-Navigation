@@ -21,6 +21,14 @@ namespace SharingService.Data
         /// </summary>
         /// <param name="anchorId">The anchor identifier.</param>
         /// <returns>The anchor key.</returns>
+        Task<string> GetAnchorObjectAsync(long anchorId);
+
+
+        /// <summary>
+        /// Gets the anchor key asynchronously.
+        /// </summary>
+        /// <param name="anchorId">The anchor identifier.</param>
+        /// <returns>The anchor key.</returns>
         Task<string> GetAnchorKeyAsync(long anchorId);
 
         /// <summary>

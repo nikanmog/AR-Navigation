@@ -53,6 +53,18 @@ namespace SharingService.Data
             return Task.FromException<string>(new KeyNotFoundException($"The {nameof(anchorId)} {anchorId} could not be found."));
         }
 
+
+        // Remove method
+        public Task<string> GetAnchorObjectAsync(long anchorId)
+        {
+            if (this.memoryCache.TryGetValue(anchorId, out string anchorKey))
+            {
+                return Task.FromResult(anchorKey);
+            }
+
+            return Task.FromException<string>(new KeyNotFoundException($"The {nameof(anchorId)} {anchorId} could not be found."));
+        }
+
         /// <summary>
         /// Gets the last anchor key asynchronously.
         /// </summary>

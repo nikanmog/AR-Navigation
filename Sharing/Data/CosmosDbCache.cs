@@ -20,6 +20,7 @@ namespace SharingService.Data
         }
 
         public string AnchorKey { get; set; }
+        public string AnchorObject { get; set; }
     }
 
 
@@ -79,6 +80,27 @@ namespace SharingService.Data
             AnchorCacheEntity anchorEntity = result.Result as AnchorCacheEntity;
             return anchorEntity != null;
         }
+
+        /// <summary>
+        /// Gets the anchor object asynchronously.
+        /// </summary>
+        /// <param name="anchorId">The anchor identifier.</param>
+        /// <exception cref="KeyNotFoundException"></exception>
+        /// <returns>The anchor key.</returns>
+        public async Task<string> GetAnchorObjectAsync(long anchorId)
+        {
+            await this.InitializeAsync();
+
+            TableResult result = await this.dbCache.ExecuteAsync(TableOperation.Retrieve<AnchorCacheEntity>((anchorId / CosmosDbCache.partitionSize).ToString(), anchorId.ToString()));
+            AnchorCacheEntity anchorEntity = result.Result as AnchorCacheEntity;
+            if (anchorEntity != null)
+            {
+                return anchorEntity.AnchorObject;
+            }
+
+            throw new KeyNotFoundException($"The {nameof(anchorId)} {anchorId} could not be found.");
+        }
+
 
         /// <summary>
         /// Gets the anchor key asynchronously.
@@ -156,7 +178,8 @@ namespace SharingService.Data
 
             AnchorCacheEntity anchorEntity = new AnchorCacheEntity(newAnchorNumberIndex, CosmosDbCache.partitionSize)
             {
-                AnchorKey = anchorKey
+                AnchorKey = anchorKey,
+                AnchorObject = "1"
             };
 
             await this.dbCache.ExecuteAsync(TableOperation.Insert(anchorEntity));

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace SharingService.Controllers
 {
+
+
+
     [Route("api/anchors")]
     [ApiController]
     public class AnchorsController : ControllerBase
@@ -23,6 +26,22 @@ namespace SharingService.Controllers
         {
             this.anchorKeyCache = anchorKeyCache;
         }
+
+        // GET api/anchors/object/5
+        [HttpGet("object/{anchorNumber}")]
+        public async Task<ActionResult<string>> GetObjectAsync(long anchorNumber)
+        {
+            // Get the key if present
+            try
+            {
+                return await this.anchorKeyCache.GetAnchorObjectAsync(anchorNumber);
+            }
+            catch (KeyNotFoundException)
+            {
+                return this.NotFound();
+            }
+        }
+
 
         // GET api/anchors/5
         [HttpGet("{anchorNumber}")]
