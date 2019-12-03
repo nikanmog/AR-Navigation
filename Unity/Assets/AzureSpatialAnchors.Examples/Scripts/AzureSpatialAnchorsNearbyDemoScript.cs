@@ -129,28 +129,25 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             switch (currentAppState)
             {
                 case AppState.ReadyToGraph:
-                    feedbackBox.text = "Next: Tap to start a query for all anchors we just made.";
+                    feedbackBox.text = "CREATOR:Query anchors we just made.";
                     break;
                 case AppState.Graphing:
-                    feedbackBox.text = $"Making sure we can find the anchors we just made. ({locatedCount}/{numToMake})";
-                    break;
-                case AppState.ReadyToSearch:
-                    //feedbackBox.text = "Next: Tap to start looking for just the first anchor we placed.";
+                    feedbackBox.text = $"CREATOR: Find anchors we just made. ({locatedCount}/{numToMake})";
                     break;
                 case AppState.Searching:
-                    feedbackBox.text = $"Looking for the first anchor...";
+                    feedbackBox.text = $"Please go to the starting point and look around.";
  
                     break;
                 case AppState.ReadyToNeighborQuery:
-                    feedbackBox.text = "Next: Tap to start looking for anchors nearby the first anchor we placed.";
+                    feedbackBox.text = "Tap to continue";
                     break;
                 case AppState.Neighboring:
                     // We should find all anchors except for the anchor we are using as the source anchor.
-                    feedbackBox.text = $"Looking for anchors nearby the first anchor. {locatedCount}/{numToMake - 1}";
-
+                    feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
+                    
                     if (locatedCount == numToMake - 1)
                     {
-                        feedbackBox.text = "Found them all!";
+                        feedbackBox.text = "";
                         currentAppState = AppState.Done;
                     }
                     break;
@@ -238,7 +235,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     anchorIds.Add(_anchorKeyToFind);
                 }
                 startup = false;
-                feedbackBox.text = "Welcome to Microsoft";
             }
             switch (currentAppState)
             {
@@ -264,57 +260,27 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentAppState = AppState.Graphing; //do the recall..
                     break;
                 case AppState.ReadyToSearch:
-                    feedbackBox.text = "1";
                     if (!CloudManager.IsSessionStarted)
                     {
                         await CloudManager.StartSessionAsync();
                     }
-                    feedbackBox.text = "2";
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
-                    feedbackBox.text = "3";
                     SetGraphEnabled(false);
-                    feedbackBox.text = "4";
                     IEnumerable<string> anchorsToFind = new[] { anchorIds[0] };
                     SetAnchorIdsToLocate(anchorsToFind);
                     locatedCount = 0;
-                    feedbackBox.text = "5";
                     currentWatcher = CreateWatcher();
-                    feedbackBox.text = "6";
                     currentAppState = AppState.Searching;
+                   
                     break;
                 case AppState.ReadyToNeighborQuery:
-                    await CloudManager.StartSessionAsync();
                     SetGraphEnabled(true);
                     ResetAnchorIdsToLocate();
-                    SetNearbyAnchor(currentCloudAnchor, 10, numToMake);
+                    SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Neighboring;
-                    break;
-                case AppState.Done:
-                    /*
-                    await CloudManager.ResetSessionAsync();
-                    foreach (GameObject go in allSpawnedObjects)
-                    {
-                        Destroy(go);
-                    }
-                    allSpawnedObjects.Clear();
-
-                    foreach (Material m in allSpawnedMaterials)
-                    {
-                        Destroy(m);
-                    }
-                    allSpawnedMaterials.Clear();
-
-                    currentCloudAnchor = null;
-                    spawnedObject = null;
-                    spawnedObjectMat = null;
-                    spawnedObjectsPerAppState.Clear();
-                    anchorIds.Clear();
-                    currentAppState = AppState.Placing;
-                    feedbackBox.text = $"Place an object. {allSpawnedObjects.Count}/{numToMake} ";
-                    */
                     break;
                     
             }
