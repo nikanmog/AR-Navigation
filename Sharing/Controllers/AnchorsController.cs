@@ -95,9 +95,10 @@ namespace SharingService.Controllers
 
         // POST api/delete
         [HttpPost("delete")]
-        public async Task<ActionResult<bool>> DeleteAsync()
+        public async void DeleteAsync()
         {
-            return await this.anchorKeyCache.DeleteTable();
+            
+            this.anchorKeyCache.DeleteTable();
         }
 
 

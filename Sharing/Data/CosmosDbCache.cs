@@ -34,8 +34,8 @@ namespace SharingService.Data
         /// <summary>
         /// The database cache.
         /// </summary>
-        private readonly CloudTable dbCache;
-
+        private CloudTable dbCache;
+        private string storageConnectionString;
         /// <summary>
         /// The anchor numbering index.
         /// </summary>
@@ -62,6 +62,7 @@ namespace SharingService.Data
 
         public CosmosDbCache(string storageConnectionString)
         {
+            this.storageConnectionString = storageConnectionString;
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             this.dbCache = tableClient.GetTableReference("AnchorCache");
@@ -156,11 +157,15 @@ namespace SharingService.Data
         /// <summary>
         /// Deletes entire table.
         /// </summary>
-        public async Task<bool> DeleteTable()
+        public async void DeleteTable()
         {
-            lastAnchorNumberIndex = -1;
             await this.dbCache.DeleteIfExistsAsync();
-            return await this.dbCache.CreateIfNotExistsAsync();
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            this.dbCache = tableClient.GetTableReference("AnchorCache");
+            lastAnchorNumberIndex = -1;
+
+            await this.InitializeAsync();
         }
 
 

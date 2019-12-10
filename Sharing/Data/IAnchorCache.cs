@@ -19,7 +19,7 @@ namespace SharingService.Data
         /// <summary>
         /// Deletes Table and resets ID counter.
         /// </summary>
-        Task<bool> DeleteTable();
+        void DeleteTable();
 
 
         /// <summary>
