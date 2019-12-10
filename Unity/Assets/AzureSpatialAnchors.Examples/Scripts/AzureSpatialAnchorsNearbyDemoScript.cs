@@ -108,9 +108,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 anchorExchanger.WatchKeys(BaseSharingUrl);
 #endif
 
-
-
-
             await setMode();
             base.Start();
             
@@ -119,8 +116,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return;
             }
 
-
-            
         }
 
 

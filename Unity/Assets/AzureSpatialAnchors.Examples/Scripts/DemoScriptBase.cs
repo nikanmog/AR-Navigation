@@ -339,7 +339,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
 
 #if WINDOWS_UWP || UNITY_WSA
-                Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hitNormal);
+                Quaternion rotation = Quaternion.FromToRotation(Vector3.zero, hitNormal);
                 SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
 #endif
             }
