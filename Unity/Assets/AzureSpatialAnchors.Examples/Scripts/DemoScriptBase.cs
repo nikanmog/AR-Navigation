@@ -346,7 +346,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                 //Quaternion rotation = Quaternion.FromToRotation(Camera.main.transform.position, hitPoint);
 
-                Vector3 direction = new Vector3(hitPoint.x - Camera.main.transform.position.x, hitPoint.y - Camera.main.transform.position.y, hitPoint.z - Camera.main.transform.position.z);
+                Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
 
                 Quaternion rotation = Quaternion.LookRotation(direction);
                 
