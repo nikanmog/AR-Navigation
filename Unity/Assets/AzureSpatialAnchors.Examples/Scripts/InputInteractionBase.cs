@@ -86,7 +86,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else
             {
-                OnGazeObjectInteraction(Camera.main.transform.position + Camera.main.transform.forward * 1.5f, -Camera.main.transform.forward);
+                OnGazeObjectInteraction(Camera.main.transform.position + Camera.main.transform.forward * 1.5f, Camera.main.transform.forward);
             }
         }
 

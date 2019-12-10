@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -339,7 +340,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
 
 #if WINDOWS_UWP || UNITY_WSA
-                Quaternion rotation = Quaternion.FromToRotation(Vector3.zero, hitNormal);
+
+                //Quaternion rotation = Quaternion.FromToRotation(Vector3.zero, -hitNormal);
+
+
+                //Quaternion rotation = Quaternion.FromToRotation(Camera.main.transform.position, hitPoint);
+
+                Vector3 direction = new Vector3(hitPoint.x - Camera.main.transform.position.x, hitPoint.y - Camera.main.transform.position.y, hitPoint.z - Camera.main.transform.position.z);
+
+                Quaternion rotation = Quaternion.LookRotation(direction);
+                
                 SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
 #endif
             }
