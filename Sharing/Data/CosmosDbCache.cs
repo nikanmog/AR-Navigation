@@ -160,7 +160,7 @@ namespace SharingService.Data
         {
             lastAnchorNumberIndex = -1;
             await this.dbCache.DeleteIfExistsAsync();
-            return await this.dbCache.CreateIfNotExistsAsync()
+            return await this.dbCache.CreateIfNotExistsAsync();
         }
 
 
