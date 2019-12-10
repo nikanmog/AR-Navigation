@@ -83,7 +83,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Start is called on the frame when a script is enabled just before any
         /// of the Update methods are called the first time.
         /// </summary>
-        public override void Start()
+        public async override void Start()
         {
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             if (feedbackBox == null)

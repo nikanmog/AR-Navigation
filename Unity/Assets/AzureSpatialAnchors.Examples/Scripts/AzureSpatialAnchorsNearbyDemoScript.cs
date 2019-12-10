@@ -15,6 +15,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             Placing = 0,
             Saving,
+            Initializing,
             ReadyToSearch,
             Searching,
             ReadyToNeighborQuery,
@@ -37,7 +38,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
         }
-        private AppState _currentAppState = AppState.Placing;
+        private AppState _currentAppState = AppState.Initializing;
         // Cosmos Connection
         public string BaseSharingUrl { 
             get => baseSharingUrl; 
@@ -72,17 +73,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Start is called on the frame when a script is enabled just before any
         /// of the Update methods are called the first time.
         /// </summary>
-        public override void Start()
+        public async override void Start()
         {
-
-       
-
-            base.Start();
-            
-            if (!SanityCheckAccessConfiguration())
-            {
-                return;
-            }
 
             SpatialAnchorSamplesConfig samplesConfig = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig");
             if (string.IsNullOrWhiteSpace(BaseSharingUrl) && samplesConfig != null)
@@ -112,9 +104,22 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
 
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
                 anchorExchanger.WatchKeys(BaseSharingUrl);
-            #endif
+#endif
+
+
+
+
+            await setMode();
+            base.Start();
+            
+            if (!SanityCheckAccessConfiguration())
+            {
+                return;
+            }
+
+
             
         }
 
@@ -132,6 +137,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentAppState = AppState.ReadyToSearch;
                     anchorIds.Add(_anchorKeyToFind);
                 }
+                else
+                {
+                    _currentAppState = AppState.Placing;
+                }
             }
         }
 
@@ -144,7 +153,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             switch (currentAppState)
             {
                 case AppState.Searching:
-                    feedbackBox.text = $"Please go to the starting point and look around.";
+                    feedbackBox.text = "Please go to the starting point and look around.";
+                    break;
+                case AppState.Initializing:
+                    feedbackBox.text = "Initializing...";
                     break;
                 case AppState.ReadyToNeighborQuery:
                     feedbackBox.text = "Tap to continue";
