@@ -27,7 +27,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #region Unity Inspector Variables
         [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab = null;
+        private GameObject anchoredObjectPrefab0 = null;
         [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
         private GameObject anchoredObjectPrefab1 = null;
@@ -40,12 +40,21 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
         private GameObject anchoredObjectPrefab4 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab5 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab6 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab7 = null;
 
         [SerializeField]
         [Tooltip("SpatialAnchorManager instance to use for this demo. This is required.")]
         private SpatialAnchorManager cloudManager = null;
         #endregion // Unity Inspector Variables
-
+        private int counter = 0;
         /// <summary>
         /// Destroying the attached Behaviour will result in the game or Scene
         /// receiving OnDestroy.
@@ -341,11 +350,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
 #if WINDOWS_UWP || UNITY_WSA
 
-                //Quaternion rotation = Quaternion.FromToRotation(Vector3.zero, -hitNormal);
-
-
-                //Quaternion rotation = Quaternion.FromToRotation(Camera.main.transform.position, hitPoint);
-
                 Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
 
                 Quaternion rotation = Quaternion.LookRotation(direction);
@@ -402,8 +406,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             if (IsPlacingObject())
             {
-                Quaternion rotation = Quaternion.AngleAxis(0, Vector3.up);
+                Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
 
+                Quaternion rotation = Quaternion.LookRotation(direction);
                 SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
             }
         }
@@ -485,8 +490,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot)
         {
             // Create the prefab
-            GameObject newGameObject = GameObject.Instantiate(AnchoredObjectPrefab, worldPos, worldRot);
-
+            GameObject newGameObject = GameObject.Instantiate(AnchoredObjectPrefab[counter%2], worldPos, worldRot);
+            counter += 1;
             // Attach a cloud-native anchor behavior to help keep cloud
             // and native anchors in sync.
             newGameObject.AddComponent<CloudNativeAnchor>();
@@ -588,7 +593,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <summary>
         /// Gets the prefab used to represent an anchored object.
         /// </summary>
-        public GameObject AnchoredObjectPrefab { get { return anchoredObjectPrefab; } }
+        public GameObject[] AnchoredObjectPrefab { get { return new GameObject[8] { anchoredObjectPrefab0, anchoredObjectPrefab1, anchoredObjectPrefab2, anchoredObjectPrefab3, anchoredObjectPrefab4, anchoredObjectPrefab5, anchoredObjectPrefab6, anchoredObjectPrefab7}; } }
 
         /// <summary>
         /// Gets the <see cref="SpatialAnchorManager"/> instance used by this demo.
