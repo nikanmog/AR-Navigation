@@ -159,7 +159,8 @@ namespace SharingService.Data
         public async Task<bool> DeleteTable()
         {
             lastAnchorNumberIndex = -1;
-            return await this.dbCache.DeleteIfExistsAsync();
+            await this.dbCache.DeleteIfExistsAsync();
+            return await this.dbCache.CreateIfNotExistsAsync()
         }
 
 
