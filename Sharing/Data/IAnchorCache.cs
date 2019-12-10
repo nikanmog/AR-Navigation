@@ -17,6 +17,12 @@ namespace SharingService.Data
         Task<bool> ContainsAsync(long anchorId);
 
         /// <summary>
+        /// Deletes Table and resets ID counter.
+        /// </summary>
+        Task<bool> DeleteTable();
+
+
+        /// <summary>
         /// Gets the anchor key asynchronously.
         /// </summary>
         /// <param name="anchorId">The anchor identifier.</param>

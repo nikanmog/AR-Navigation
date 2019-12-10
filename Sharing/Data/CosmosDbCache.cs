@@ -102,6 +102,7 @@ namespace SharingService.Data
         }
 
 
+
         /// <summary>
         /// Gets the anchor key asynchronously.
         /// </summary>
@@ -151,6 +152,17 @@ namespace SharingService.Data
         {
             return (await this.GetLastAnchorAsync())?.AnchorKey;
         }
+
+        /// <summary>
+        /// Deletes entire table.
+        /// </summary>
+        public async Task<bool> DeleteTable()
+        {
+            lastAnchorNumberIndex = -1;
+            return await this.dbCache.DeleteIfExistsAsync();
+        }
+
+
 
         /// <summary>
         /// Sets the anchor key asynchronously.

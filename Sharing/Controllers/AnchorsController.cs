@@ -91,5 +91,15 @@ namespace SharingService.Controllers
             // Set the key and return the anchor number
             return await this.anchorKeyCache.SetAnchorKeyAsync(anchorKey);
         }
+
+
+        // POST api/delete
+        [HttpPost("delete")]
+        public async Task<ActionResult<bool>> DeleteAsync()
+        {
+            return await this.anchorKeyCache.DeleteTable();
+        }
+
+
     }
 }

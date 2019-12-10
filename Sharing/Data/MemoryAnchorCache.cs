@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SharingService.Data
 {
-    internal class MemoryAnchorCache : IAnchorKeyCache
+    internal class MemoryAnchorCache //: IAnchorKeyCache
     {
         /// <summary>
         /// The entry cache options.
@@ -36,6 +36,7 @@ namespace SharingService.Data
         {
             return Task.FromResult(this.memoryCache.TryGetValue(anchorId, out _));
         }
+
 
         /// <summary>
         /// Gets the anchor key asynchronously.
