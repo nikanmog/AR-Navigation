@@ -15,13 +15,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             Placing = 0,
             Saving,
-            ReadyToGraph,
-            Graphing,
             ReadyToSearch,
             Searching,
             ReadyToNeighborQuery,
             Neighboring,
-            Done,
             ModeCount
         }
         AppState currentAppState
@@ -77,8 +74,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Start()
         {
-            base.Start();
 
+       
+
+            base.Start();
+            
             if (!SanityCheckAccessConfiguration())
             {
                 return;
@@ -112,10 +112,27 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
 
-#if !UNITY_EDITOR
+            #if !UNITY_EDITOR
                 anchorExchanger.WatchKeys(BaseSharingUrl);
-#endif
+            #endif
+            
+        }
 
+
+        private async Task setMode()
+        {
+           await AdvanceDemoAsync();
+
+            {
+#if !UNITY_EDITOR
+                            _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1); 
+#endif
+                if (_anchorKeyToFind != null)
+                {
+                    currentAppState = AppState.ReadyToSearch;
+                    anchorIds.Add(_anchorKeyToFind);
+                }
+            }
         }
 
         /// <summary>
@@ -124,19 +141,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Update()
         {
             base.Update();
-
-
             switch (currentAppState)
             {
-                case AppState.ReadyToGraph:
-                    feedbackBox.text = "CREATOR:Query anchors we just made.";
-                    break;
-                case AppState.Graphing:
-                    feedbackBox.text = $"CREATOR: Find anchors we just made. ({locatedCount}/{numToMake})";
-                    break;
                 case AppState.Searching:
                     feedbackBox.text = $"Please go to the starting point and look around.";
- 
                     break;
                 case AppState.ReadyToNeighborQuery:
                     feedbackBox.text = "Tap to continue";
@@ -148,7 +156,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     if (locatedCount == numToMake - 1)
                     {
                         feedbackBox.text = "";
-                        currentAppState = AppState.Done;
                     }
                     break;
             }
@@ -177,14 +184,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                     spawnedObject = null;
 
-                    if (currentAppState == AppState.Graphing)
-                    {
-                        if (spawnedObjectsInCurrentAppState.Count == anchorIds.Count)
-                        {
-                            currentAppState = AppState.ReadyToSearch;
-                        }
-                    }
-                    else if (currentAppState == AppState.Searching)
+                    if (currentAppState == AppState.Searching)
                     {
                         currentAppState = AppState.ReadyToNeighborQuery;
                     }
@@ -221,21 +221,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             #endif
         }
-        private bool startup = true;
+
         public async override Task AdvanceDemoAsync()
         {
-            if (startup == true)
-            {
-            #if !UNITY_EDITOR
-                            _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1); 
-            #endif
-                if (_anchorKeyToFind != null)
-                {
-                    currentAppState = AppState.ReadyToSearch;
-                    anchorIds.Add(_anchorKeyToFind);
-                }
-                startup = false;
-            }
             switch (currentAppState)
             {
                 case AppState.Placing:
@@ -248,16 +236,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                         }
                         await SaveCurrentObjectAnchorToCloudAsync();
                     }
-                    break;
-                case AppState.ReadyToGraph:
-                    SetGraphEnabled(false);
-                    await CloudManager.ResetSessionAsync();
-                    locatedCount = 0;
-                    SetAnchorIdsToLocate(anchorIds);
-                    SetNearbyAnchor(null, 10, numToMake);
-                    await CloudManager.StartSessionAsync();
-                    currentWatcher = CreateWatcher();
-                    currentAppState = AppState.Graphing; //do the recall..
                     break;
                 case AppState.ReadyToSearch:
                     if (!CloudManager.IsSessionStarted)
@@ -272,7 +250,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Searching;
-                   
                     break;
                 case AppState.ReadyToNeighborQuery:
                     SetGraphEnabled(true);
@@ -310,6 +287,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             #endif
             // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
+            
             SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
 
             spawnedObject = null;
@@ -324,7 +302,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 feedbackBox.text = "Saved... ready to start finding them.";
                 CloudManager.StopSession();
-                currentAppState = AppState.ReadyToGraph;
+                currentAppState = AppState.ReadyToSearch;
             }
         }
 

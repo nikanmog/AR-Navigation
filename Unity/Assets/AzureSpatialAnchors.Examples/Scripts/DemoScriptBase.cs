@@ -27,6 +27,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
         private GameObject anchoredObjectPrefab = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab1 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab2 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab3 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab4 = null;
 
         [SerializeField]
         [Tooltip("SpatialAnchorManager instance to use for this demo. This is required.")]
@@ -80,7 +92,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 Destroy(this);
                 return;
             }
-
+            
             if (CloudManager == null)
             {
                 Debug.Break();
@@ -323,10 +335,15 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.OnGazeObjectInteraction(hitPoint, hitNormal);
 
-            #if WINDOWS_UWP || UNITY_WSA
-            Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hitNormal);
-            SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
-            #endif
+            if (IsPlacingObject())
+            {
+
+#if WINDOWS_UWP || UNITY_WSA
+                Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hitNormal);
+                SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
+#endif
+            }
+
         }
 
         /// <summary>
