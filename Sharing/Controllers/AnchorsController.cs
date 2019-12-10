@@ -95,12 +95,10 @@ namespace SharingService.Controllers
 
         // POST api/delete
         [HttpPost("delete")]
-        public async void DeleteAsync()
+        public void DeleteAsync()
         {
             
             this.anchorKeyCache.DeleteTable();
         }
-
-
     }
 }

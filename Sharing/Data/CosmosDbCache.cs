@@ -166,6 +166,7 @@ namespace SharingService.Data
             lastAnchorNumberIndex = -1;
 
             await this.InitializeAsync();
+            await this.dbCache.CreateIfNotExistsAsync();
         }
 
 
