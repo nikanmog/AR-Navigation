@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9052126660705777869}
   - component: {fileID: 2619071529252312189}
   - component: {fileID: 8042095162876111967}
+  - component: {fileID: 8030352216830886696}
   m_Layer: 0
   m_Name: ARCamera
   m_TagString: MainCamera
@@ -125,6 +126,14 @@ MonoBehaviour:
   m_CustomMaterial: {fileID: 0}
   m_UseCustomRendererAsset: 0
   m_CustomRendererAsset: {fileID: 0}
+--- !u!81 &8030352216830886696
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5511864754946356474}
+  m_Enabled: 1
 --- !u!1 &7557246849223751478
 GameObject:
   m_ObjectHideFlags: 0
