@@ -888,6 +888,20 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 45cd014bb2996fe4889890850b3f457d, type: 3}
+--- !u!1 &567398704 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1773021142251480, guid: 45cd014bb2996fe4889890850b3f457d,
+    type: 3}
+  m_PrefabInstance: {fileID: 567398703}
+  m_PrefabAsset: {fileID: 0}
+--- !u!81 &567398705
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567398704}
+  m_Enabled: 1
 --- !u!1 &1062206416
 GameObject:
   m_ObjectHideFlags: 0
