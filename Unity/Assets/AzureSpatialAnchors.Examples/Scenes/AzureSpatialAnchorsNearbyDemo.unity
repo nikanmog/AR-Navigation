@@ -328,7 +328,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anchoredObjectPrefab0: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
     type: 3}
-  anchoredObjectPrefab1: {fileID: 1147623660883556, guid: b340d9f0d9ea4ed448c84146e7ff9659,
+  anchoredObjectPrefab1: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
     type: 3}
   anchoredObjectPrefab2: {fileID: 0}
   anchoredObjectPrefab3: {fileID: 0}
