@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2831368965740457464}
   - component: {fileID: -411696535674928572}
   m_Layer: 0
-  m_Name: RoomAvailable
+  m_Name: RoomBusy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -110,7 +110,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 4bd75f535e41106459c5aba6854b1cea, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 64e6c2273e0327546909e6975b662937, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -998,7 +998,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5e6d53ef5df587d4db475f11b69394f6, type: 2}
+  - {fileID: 2100000, guid: c829c5538e55b194f818f69a9d0f642e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
