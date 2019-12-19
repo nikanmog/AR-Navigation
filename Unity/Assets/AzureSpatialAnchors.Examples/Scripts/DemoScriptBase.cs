@@ -449,9 +449,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 await Task.Delay(330);
                 float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
                 feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
+                scanImage.SetActive(true);
             }
 
             bool success = false;
+            scanImage.SetActive(false);
             feedbackBox.text = "Saving...";
 
             try
