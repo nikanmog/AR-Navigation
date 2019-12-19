@@ -40,6 +40,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 #endif
         }
 
+
+
         /// <summary>
         /// Gets the correct feedback text control for the demo
         /// </summary>
@@ -60,6 +62,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 GameObject child = sourceTree.transform.GetChild(index).gameObject;
                 Text t = child.GetComponent<Text>();
+                
                 if (t != null)
                 {
                     return t;
@@ -68,6 +71,41 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
 
             Debug.LogError("Did not find feedback text control.");
+            return null;
+        }
+
+
+
+        /// <summary>
+        /// Gets the correct feedback text control for the demo
+        /// </summary>
+        /// <returns>The feedback text control if it found it</returns>
+        public GameObject GetOrientation()
+        {
+            GameObject sourceTree = null;
+
+#if UNITY_WSA
+            sourceTree = HoloLensUXTree;
+#else
+            sourceTree = MobileAndEditorUXTree;
+#endif
+
+            Debug.Log(sourceTree.transform.childCount);
+            int childCount = sourceTree.transform.childCount;
+            for (int index = 0; index < childCount; index++)
+            {
+                GameObject child = sourceTree.transform.GetChild(index).gameObject;
+                //GameObject t = child.GetComponent<GameObject>();
+                
+                if (child != null && child.name == "Scan")
+                {
+                    
+                    return child;
+                }
+
+            }
+
+            Debug.LogError("Did not find feedback Scan control.");
             return null;
         }
 

@@ -49,7 +49,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             public AnchorExchanger anchorExchanger = new AnchorExchanger();
 #endif
         private string _anchorKeyToFind = null;
-        private readonly int numToMake = 8;
+        private readonly int numToMake = 4;
 
         readonly List<string> anchorIds = new List<string>();
         readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
@@ -115,7 +115,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 return;
             }
-
+            
         }
 
 
@@ -144,19 +144,26 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Update()
         {
+
+            
             base.Update();
             switch (currentAppState)
             {
                 case AppState.Searching:
+                    scanImage.SetActive(true);
                     feedbackBox.text = "Please go to the starting point and look around.";
+                    //scanImage.SetActive(true);
                     break;
                 case AppState.Initializing:
+                    scanImage.SetActive(false);
                     feedbackBox.text = "Initializing...";
                     break;
                 case AppState.ReadyToNeighborQuery:
+                    scanImage.SetActive(false);
                     feedbackBox.text = "Tap to continue";
                     break;
                 case AppState.Neighboring:
+                    scanImage.SetActive(false);
                     // We should find all anchors except for the anchor we are using as the source anchor.
                     feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
                     
@@ -181,7 +188,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     locatedCount++;
                     currentCloudAnchor = args.Anchor;
                     Pose anchorPose = Pose.identity;
-
+                    
                     #if UNITY_ANDROID || UNITY_IOS
                     anchorPose = currentCloudAnchor.GetPose();
                     #endif

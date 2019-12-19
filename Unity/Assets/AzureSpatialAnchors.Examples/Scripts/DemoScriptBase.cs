@@ -16,6 +16,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private Task advanceDemoTask = null;
         protected bool isErrorActive = false;
         protected Text feedbackBox;
+        protected GameObject scanImage;
         protected readonly List<string> anchorIdsToLocate = new List<string>();
         protected AnchorLocateCriteria anchorLocateCriteria = null;
         protected CloudSpatialAnchor currentCloudAnchor;
@@ -96,6 +97,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public async override void Start()
         {
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            scanImage = XRUXPicker.Instance.GetOrientation();
             if (feedbackBox == null)
             {
                 Debug.Log($"{nameof(feedbackBox)} not found in scene by XRUXPicker.");
@@ -450,7 +452,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
 
             bool success = false;
-
             feedbackBox.text = "Saving...";
 
             try
