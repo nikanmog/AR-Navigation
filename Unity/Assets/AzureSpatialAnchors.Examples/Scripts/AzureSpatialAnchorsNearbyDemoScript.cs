@@ -49,7 +49,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             public AnchorExchanger anchorExchanger = new AnchorExchanger();
 #endif
         private string _anchorKeyToFind = null;
-        private readonly int numToMake = 8;
+        private readonly int numToMake = 5;
 
         readonly List<string> anchorIds = new List<string>();
         readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
