@@ -63,17 +63,12 @@ namespace SharingService.Controllers
 
         // GET api/anchors/last
         [HttpGet("last/type")]
-        public async Task<ActionResult<string>> GetNumberAsync()
+        public async Task<ActionResult<int>> GetNumberAsync()
         {
             // Get the last anchor
-            string anchorKey = await this.anchorKeyCache.GetLastAnchorTypeAsync();
+            int anchorType = int.Parse(await this.anchorKeyCache.GetLastAnchorTypeAsync());
 
-            if (anchorKey == null)
-            {
-                return "";
-            }
-
-            return anchorKey;
+            return anchorType;
         }
 
         // POST api/anchors

@@ -35,12 +35,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     while (true)
                     {
                         string currentKey = await RetrieveLastAnchorKey();
+                        int currentType = await RetrieveLastAnchorType();
                         if (!string.IsNullOrWhiteSpace(currentKey) && currentKey != previousKey)
                         {
                             Debug.Log("Found key " + currentKey);
                             lock (anchorkeys)
                             {
-                                anchorkeys.Add(currentKey, 1);
+                                anchorkeys.Add(currentKey, currentType);
                             }
                             previousKey = currentKey;
                         }
