@@ -20,7 +20,7 @@ namespace SharingService.Data
         }
 
         public string AnchorKey { get; set; }
-        public string AnchorType { get; set; }
+        public int AnchorType { get; set; }
     }
 
 
@@ -82,25 +82,6 @@ namespace SharingService.Data
             return anchorEntity != null;
         }
 
-        /// <summary>
-        /// Gets the anchor object asynchronously.
-        /// </summary>
-        /// <param name="anchorId">The anchor identifier.</param>
-        /// <exception cref="KeyNotFoundException"></exception>
-        /// <returns>The anchor key.</returns>
-        public async Task<string> GetAnchorTypeAsync(long anchorId)
-        {
-            await this.InitializeAsync();
-
-            TableResult result = await this.dbCache.ExecuteAsync(TableOperation.Retrieve<AnchorCacheEntity>((anchorId / CosmosDbCache.partitionSize).ToString(), anchorId.ToString()));
-            AnchorCacheEntity anchorEntity = result.Result as AnchorCacheEntity;
-            if (anchorEntity != null)
-            {
-                return anchorEntity.AnchorType;
-            }
-
-            throw new KeyNotFoundException($"The {nameof(anchorId)} {anchorId} could not be found.");
-        }
 
 
 
@@ -158,9 +139,9 @@ namespace SharingService.Data
         /// Gets the last anchor key asynchronously.
         /// </summary>
         /// <returns>The anchor key.</returns>
-        public async Task<string> GetLastAnchorTypeAsync()
+        public async Task<int> GetLastAnchorTypeAsync()
         {
-            return (await this.GetLastAnchorAsync())?.AnchorType;
+            return (await this.GetLastAnchorAsync()).AnchorType;
         }
 
         /// <summary>
@@ -178,7 +159,20 @@ namespace SharingService.Data
             await this.dbCache.CreateIfNotExistsAsync();
         }
 
+        /// <summary>
+        /// Deletes entire table.
+        /// </summary>
+        public async void UpdateTable ()
+        {
 
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(storageConnectionString);
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            this.dbCache = tableClient.GetTableReference("AnchorCache");
+
+
+            await this.InitializeAsync();
+            await this.dbCache.CreateIfNotExistsAsync();
+        }
 
         /// <summary>
         /// Sets the anchor key asynchronously.
@@ -207,7 +201,7 @@ namespace SharingService.Data
             AnchorCacheEntity anchorEntity = new AnchorCacheEntity(newAnchorNumberIndex, CosmosDbCache.partitionSize)
             {
                 AnchorKey = anchorKey,
-                AnchorType = "1"
+                AnchorType = 1
             };
 
             await this.dbCache.ExecuteAsync(TableOperation.Insert(anchorEntity));

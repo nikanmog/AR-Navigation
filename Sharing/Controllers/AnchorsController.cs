@@ -61,14 +61,12 @@ namespace SharingService.Controllers
             return anchorKey;
         }
 
-        // GET api/anchors/last
+        // GET api/anchors/last/type
         [HttpGet("last/type")]
-        public async Task<ActionResult<int>> GetNumberAsync()
+        public async Task<ActionResult<int>> GetTypeAsync()
         {
-            // Get the last anchor
-            int anchorType = int.Parse(await this.anchorKeyCache.GetLastAnchorTypeAsync());
-
-            return anchorType;
+            int anchortype = await this.anchorKeyCache.GetLastAnchorTypeAsync();
+            return anchortype;
         }
 
         // POST api/anchors
@@ -98,5 +96,14 @@ namespace SharingService.Controllers
             
             this.anchorKeyCache.DeleteTable();
         }
+
+        // POST api/update
+        [HttpPost("update")]
+        public void UpdateAsync()
+        {
+
+            this.anchorKeyCache.UpdateTable();
+        }
+
     }
 }
