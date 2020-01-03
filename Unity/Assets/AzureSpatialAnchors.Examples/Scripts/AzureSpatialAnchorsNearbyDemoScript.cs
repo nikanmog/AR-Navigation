@@ -105,7 +105,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
 
             anchorExchanger.WatchKeys(BaseSharingUrl);
-            anchorIds = anchorExchanger.anchorkeys;
+            
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
 
             await setMode();
@@ -115,6 +116,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 return;
             }
+            base.anchorExchanger = this.anchorExchanger;
             
         }
 
@@ -130,7 +132,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 if (_anchorKeyToFind != null)
                 {
                     currentAppState = AppState.ReadyToSearch;
-                    //anchorIds.Add(_anchorKeyToFind);
                 }
                 else
                 {
@@ -146,7 +147,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
 
 
-                            anchorIds = anchorExchanger.anchorkeys;
+                            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
 
 

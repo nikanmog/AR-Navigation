@@ -23,6 +23,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected CloudSpatialAnchorWatcher currentWatcher;
         protected GameObject spawnedObject = null;
         protected Material spawnedObjectMat = null;
+        protected AnchorExchanger anchorExchanger = null;
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -218,7 +219,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected void ResetAnchorIdsToLocate()
         {
             anchorIdsToLocate.Clear();
-            
             anchorLocateCriteria.Identifiers = new string[0];
         }
 
@@ -491,11 +491,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <param name="worldPos">The world position.</param>
         /// <param name="worldRot">The world rotation.</param>
         /// <returns><see cref="GameObject"/>.</returns>
-        protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot)
+        protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot, int type)
         {
             // Create the prefab
-            GameObject newGameObject = GameObject.Instantiate(AnchoredObjectPrefab[counter%2], worldPos, worldRot);
-            counter += 1;
+
+            GameObject newGameObject = GameObject.Instantiate(AnchoredObjectPrefab[type], worldPos, worldRot);
+
             // Attach a cloud-native anchor behavior to help keep cloud
             // and native anchors in sync.
             newGameObject.AddComponent<CloudNativeAnchor>();
@@ -514,19 +515,20 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <returns><see cref="GameObject"/>.</returns>
         protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot, CloudSpatialAnchor cloudSpatialAnchor)
         {
-            // Create the object like usual
-            GameObject newGameObject = SpawnNewAnchoredObject(worldPos, worldRot);
-            
+
             // If a cloud anchor is passed, apply it to the native anchor
             if (cloudSpatialAnchor != null)
             {
+                GameObject newGameObject = SpawnNewAnchoredObject(worldPos, worldRot, anchorExchanger.anchorType(cloudSpatialAnchor.Identifier));
                 CloudNativeAnchor cloudNativeAnchor = newGameObject.GetComponent<CloudNativeAnchor>();
                 cloudNativeAnchor.CloudToNative(cloudSpatialAnchor);
+                return newGameObject;
             }
-
-
-            // Return newly created object
-            return newGameObject;
+            else
+            {
+                return SpawnNewAnchoredObject(worldPos, worldRot, 0);
+            }
+                        
         }
 
         /// <summary>

@@ -13,15 +13,15 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         private string baseAddress = "";
 
-        public List<string> anchorkeys = new List<string>();
+        public Dictionary<string, int> anchorkeys = new Dictionary<string, int>();
 
-        public List<string> AnchorKeys
+        public Dictionary<string, int> AnchorKeys
         {
             get
             {
                 lock (anchorkeys)
                 {
-                    return new List<string>(anchorkeys);
+                    return new Dictionary<string, int>(anchorkeys);
                 }
             }
         }
@@ -40,13 +40,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                             Debug.Log("Found key " + currentKey);
                             lock (anchorkeys)
                             {
-                                anchorkeys.Add(currentKey);
+                                anchorkeys.Add(currentKey, 1);
                             }
                             previousKey = currentKey;
                         }
                         await Task.Delay(500);
                     }
                 }, TaskCreationOptions.LongRunning);
+        }
+        public int anchorType(string anchorKey)
+        {
+            int defaultType = 0;
+            
+            if (anchorkeys.ContainsKey(anchorKey))
+            {
+                return anchorkeys[anchorKey];
+            }
+            return defaultType;
         }
 
         public async Task<string> RetrieveAnchorKey(long anchorNumber)
