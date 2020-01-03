@@ -10,7 +10,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class AnchorExchanger
     {
-#if !UNITY_EDITOR
+
         private string baseAddress = "";
 
         public List<string> anchorkeys = new List<string>();
@@ -119,6 +119,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return -1;
             }
         }
-#endif
+
     }
 }

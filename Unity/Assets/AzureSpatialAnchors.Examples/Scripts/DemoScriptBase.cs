@@ -218,6 +218,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected void ResetAnchorIdsToLocate()
         {
             anchorIdsToLocate.Clear();
+            
             anchorLocateCriteria.Identifiers = new string[0];
         }
 
