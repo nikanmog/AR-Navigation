@@ -10,19 +10,17 @@ using System.Threading.Tasks;
 namespace SharingService.Controllers
 {
 
-
-
     [Route("api/anchors")]
     [ApiController]
     public class AnchorsController : ControllerBase
     {
-        private readonly IAnchorKeyCache anchorKeyCache;
+        private readonly CosmosDbCache anchorKeyCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AnchorsController"/> class.
         /// </summary>
         /// <param name="anchorKeyCache">The anchor key cache.</param>
-        public AnchorsController(IAnchorKeyCache anchorKeyCache)
+        public AnchorsController(CosmosDbCache anchorKeyCache)
         {
             this.anchorKeyCache = anchorKeyCache;
         }
@@ -34,7 +32,7 @@ namespace SharingService.Controllers
             // Get the key if present
             try
             {
-                return await this.anchorKeyCache.GetAnchorObjectAsync(anchorNumber);
+                return await this.anchorKeyCache.GetAnchorTypeAsync(anchorNumber);
             }
             catch (KeyNotFoundException)
             {
@@ -57,6 +55,9 @@ namespace SharingService.Controllers
                 return this.NotFound();
             }
         }
+
+
+
 
         // GET api/anchors/last
         [HttpGet("last")]

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SharingService.Data
 {
-    internal class AnchorCacheEntity : TableEntity
+    public class AnchorCacheEntity : TableEntity
     {
         public AnchorCacheEntity() { }
 
@@ -20,11 +20,11 @@ namespace SharingService.Data
         }
 
         public string AnchorKey { get; set; }
-        public string AnchorObject { get; set; }
+        public string AnchorType { get; set; }
     }
 
 
-    internal class CosmosDbCache : IAnchorKeyCache
+    public class CosmosDbCache
     {
         /// <summary>
         /// Super basic partitioning scheme
@@ -88,7 +88,7 @@ namespace SharingService.Data
         /// <param name="anchorId">The anchor identifier.</param>
         /// <exception cref="KeyNotFoundException"></exception>
         /// <returns>The anchor key.</returns>
-        public async Task<string> GetAnchorObjectAsync(long anchorId)
+        public async Task<string> GetAnchorTypeAsync(long anchorId)
         {
             await this.InitializeAsync();
 
@@ -96,7 +96,7 @@ namespace SharingService.Data
             AnchorCacheEntity anchorEntity = result.Result as AnchorCacheEntity;
             if (anchorEntity != null)
             {
-                return anchorEntity.AnchorObject;
+                return anchorEntity.AnchorType;
             }
 
             throw new KeyNotFoundException($"The {nameof(anchorId)} {anchorId} could not be found.");
@@ -198,7 +198,7 @@ namespace SharingService.Data
             AnchorCacheEntity anchorEntity = new AnchorCacheEntity(newAnchorNumberIndex, CosmosDbCache.partitionSize)
             {
                 AnchorKey = anchorKey,
-                AnchorObject = "1"
+                AnchorType = "1"
             };
 
             await this.dbCache.ExecuteAsync(TableOperation.Insert(anchorEntity));

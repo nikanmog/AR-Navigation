@@ -28,11 +28,9 @@ namespace SharingService
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // Register the anchor key cache.
-#if INMEMORY_DEMO
-            services.AddSingleton<IAnchorKeyCache>(new MemoryAnchorCache());
-#else
-            services.AddSingleton<IAnchorKeyCache>(new CosmosDbCache(this.Configuration.GetValue<string>("StorageConnectionString")));
-#endif
+
+            services.AddSingleton<CosmosDbCache>(new CosmosDbCache(this.Configuration.GetValue<string>("StorageConnectionString")));
+
 
             // Add an http client
             services.AddHttpClient<SpatialAnchorsTokenService>();
