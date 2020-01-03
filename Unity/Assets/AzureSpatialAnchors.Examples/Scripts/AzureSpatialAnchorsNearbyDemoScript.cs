@@ -46,7 +46,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         private string baseSharingUrl = "";
 
-            public AnchorExchanger anchorExchanger = new AnchorExchanger();
+        public AnchorExchanger anchorExchanger = new AnchorExchanger();
 
         private string _anchorKeyToFind = null;
         private readonly int numToMake = 5;

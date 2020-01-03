@@ -155,6 +155,15 @@ namespace SharingService.Data
         }
 
         /// <summary>
+        /// Gets the last anchor key asynchronously.
+        /// </summary>
+        /// <returns>The anchor key.</returns>
+        public async Task<string> GetLastAnchorTypeAsync()
+        {
+            return (await this.GetLastAnchorAsync())?.AnchorType;
+        }
+
+        /// <summary>
         /// Deletes entire table.
         /// </summary>
         public async void DeleteTable()

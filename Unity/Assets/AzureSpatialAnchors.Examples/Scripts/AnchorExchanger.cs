@@ -89,6 +89,22 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
+        public async Task<int> RetrieveLastAnchorType()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                
+                return int.Parse(await client.GetStringAsync(baseAddress + "/last/type"));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError("Failed to retrieve last anchor key.");
+                return 0;
+            }
+        }
+
         internal async Task<long> StoreAnchorKey(string anchorKey)
         {
             if (string.IsNullOrWhiteSpace(anchorKey))

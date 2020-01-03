@@ -25,20 +25,7 @@ namespace SharingService.Controllers
             this.anchorKeyCache = anchorKeyCache;
         }
 
-        // GET api/anchors/object/5
-        [HttpGet("object/{anchorNumber}")]
-        public async Task<ActionResult<string>> GetObjectAsync(long anchorNumber)
-        {
-            // Get the key if present
-            try
-            {
-                return await this.anchorKeyCache.GetAnchorTypeAsync(anchorNumber);
-            }
-            catch (KeyNotFoundException)
-            {
-                return this.NotFound();
-            }
-        }
+
 
 
         // GET api/anchors/5
@@ -65,6 +52,21 @@ namespace SharingService.Controllers
         {
             // Get the last anchor
             string anchorKey = await this.anchorKeyCache.GetLastAnchorKeyAsync();
+
+            if (anchorKey == null)
+            {
+                return "";
+            }
+
+            return anchorKey;
+        }
+
+        // GET api/anchors/last
+        [HttpGet("last/type")]
+        public async Task<ActionResult<string>> GetNumberAsync()
+        {
+            // Get the last anchor
+            string anchorKey = await this.anchorKeyCache.GetLastAnchorTypeAsync();
 
             if (anchorKey == null)
             {
