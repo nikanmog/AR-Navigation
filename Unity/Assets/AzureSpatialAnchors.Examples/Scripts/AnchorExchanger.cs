@@ -13,7 +13,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 #if !UNITY_EDITOR
         private string baseAddress = "";
 
-        private List<string> anchorkeys = new List<string>();
+        public List<string> anchorkeys = new List<string>();
 
         public List<string> AnchorKeys
         {

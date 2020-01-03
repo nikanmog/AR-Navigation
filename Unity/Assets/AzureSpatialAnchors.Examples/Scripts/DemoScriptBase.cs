@@ -515,7 +515,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             // Create the object like usual
             GameObject newGameObject = SpawnNewAnchoredObject(worldPos, worldRot);
-
+            
             // If a cloud anchor is passed, apply it to the native anchor
             if (cloudSpatialAnchor != null)
             {

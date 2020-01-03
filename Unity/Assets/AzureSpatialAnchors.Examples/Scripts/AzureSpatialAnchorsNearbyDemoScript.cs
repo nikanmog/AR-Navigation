@@ -48,10 +48,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 #if !UNITY_EDITOR
             public AnchorExchanger anchorExchanger = new AnchorExchanger();
 #endif
-        private string _anchorKeyToFind = null;
+
         private readonly int numToMake = 5;
 
-        readonly List<string> anchorIds = new List<string>();
+        List<string> anchorIds = new List<string>();
         readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
         private readonly List<GameObject> allSpawnedObjects = new List<GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
@@ -106,6 +106,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
 #if !UNITY_EDITOR
                 anchorExchanger.WatchKeys(BaseSharingUrl);
+            anchorIds = anchorExchanger.anchorkeys;
 #endif
 
             await setMode();
@@ -124,13 +125,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
            await AdvanceDemoAsync();
 
             {
-#if !UNITY_EDITOR
-                            _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1); 
-#endif
-                if (_anchorKeyToFind != null)
+
+                if (anchorIds != null)
                 {
                     currentAppState = AppState.ReadyToSearch;
-                    anchorIds.Add(_anchorKeyToFind);
                 }
                 else
                 {
@@ -145,7 +143,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Update()
         {
 
-            
+#if !UNITY_EDITOR
+                            anchorIds = anchorExchanger.anchorkeys;
+#endif
+
+
             base.Update();
             switch (currentAppState)
             {
@@ -259,7 +261,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
                     SetGraphEnabled(false);
-                    IEnumerable<string> anchorsToFind = new[] { anchorIds[0] };
+                    IEnumerable<string> anchorsToFind = anchorIds;
                     SetAnchorIdsToLocate(anchorsToFind);
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
@@ -283,15 +285,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             Debug.Log("Anchor created, yay!");
 
-            anchorIds.Add(currentCloudAnchor.Identifier);
-
-            long anchorNumber = -1;
-
-            anchorIds.Add(currentCloudAnchor.Identifier);
-
-            #if !UNITY_EDITOR
-                        anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
-            #endif
 
             // Sanity check that the object is still where we expect
             Pose anchorPose = Pose.identity;
