@@ -44,6 +44,20 @@ namespace SharingService.Controllers
         }
 
 
+        // GET api/type/5
+        [HttpGet("type/{anchorNumber}")]
+        public async Task<ActionResult<int>> GetTypeAsync(long anchorNumber)
+        {
+            // Get the key if present
+            try
+            {
+                return await this.anchorKeyCache.GetAnchorTypeAsync(anchorNumber);
+            }
+            catch (KeyNotFoundException)
+            {
+                return this.NotFound();
+            }
+        }
 
 
         // GET api/anchors/last
@@ -68,6 +82,7 @@ namespace SharingService.Controllers
             int anchortype = await this.anchorKeyCache.GetLastAnchorTypeAsync();
             return anchortype;
         }
+
 
         // POST api/anchors
         [HttpPost]

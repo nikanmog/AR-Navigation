@@ -106,6 +106,27 @@ namespace SharingService.Data
         }
 
         /// <summary>
+        /// Gets the anchor key asynchronously.
+        /// </summary>
+        /// <param name="anchorId">The anchor identifier.</param>
+        /// <exception cref="KeyNotFoundException"></exception>
+        /// <returns>The anchor key.</returns>
+        public async Task<int> GetAnchorTypeAsync(long anchorId)
+        {
+            await this.InitializeAsync();
+
+            TableResult result = await this.dbCache.ExecuteAsync(TableOperation.Retrieve<AnchorCacheEntity>((anchorId / CosmosDbCache.partitionSize).ToString(), anchorId.ToString()));
+            AnchorCacheEntity anchorEntity = result.Result as AnchorCacheEntity;
+            if (anchorEntity != null)
+            {
+                return anchorEntity.AnchorType;
+            }
+
+            throw new KeyNotFoundException($"The {nameof(anchorId)} {anchorId} could not be found.");
+        }
+
+
+        /// <summary>
         /// Gets the last anchor asynchronously.
         /// </summary>
         /// <returns>The anchor.</returns>
@@ -133,6 +154,16 @@ namespace SharingService.Data
         public async Task<string> GetLastAnchorKeyAsync()
         {
             return (await this.GetLastAnchorAsync())?.AnchorKey;
+        }
+
+
+        /// <summary>
+        /// Gets the last anchor key asynchronously.
+        /// </summary>
+        /// <returns>The anchor key.</returns>
+        public async Task<int> GetAnchorCountAsync()
+        {
+            return 0;// TBD
         }
 
         /// <summary>

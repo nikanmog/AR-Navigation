@@ -31,19 +31,21 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             baseAddress = exchangerUrl;
             Task.Factory.StartNew(async () =>
                 {
-                    string previousKey = string.Empty;
                     while (true)
                     {
-                        string currentKey = await RetrieveLastAnchorKey();
-                        int currentType = await RetrieveLastAnchorType();
-                        if (!string.IsNullOrWhiteSpace(currentKey) && currentKey != previousKey)
+                        for (int i = 1; 1<5; i++)
                         {
-                            Debug.Log("Found key " + currentKey);
-                            lock (anchorkeys)
+                            string currentKey = await RetrieveAnchorKey(i);
+                            int currentType = await RetrieveAnchorType(i);
+                            if (!string.IsNullOrWhiteSpace(currentKey))
                             {
-                                anchorkeys.Add(currentKey, currentType);
+                                Debug.Log("Found key " + currentKey);
+                                lock (anchorkeys)
+                                {
+                                    anchorkeys.Add(currentKey, currentType);
+                                }
                             }
-                            previousKey = currentKey;
+                            await Task.Delay(500);
                         }
                         await Task.Delay(500);
                     }
@@ -51,7 +53,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         public int anchorType(string anchorKey)
         {
-            int defaultType = 0;
+            int defaultType = 1;
             
             if (anchorkeys.ContainsKey(anchorKey))
             {
@@ -74,6 +76,24 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return null;
             }
         }
+
+
+        public async Task<int> RetrieveAnchorType(long anchorNumber)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                return int.Parse(await client.GetStringAsync(baseAddress + "/type/" + anchorNumber.ToString()));
+
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError($"Failed to retrieve anchor key for anchor number: {anchorNumber}.");
+                return 0;
+            }
+        }
+
 
         public async Task<string> RetrieveLastAnchorKey()
         {
