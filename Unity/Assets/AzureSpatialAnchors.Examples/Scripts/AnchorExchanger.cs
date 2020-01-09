@@ -10,18 +10,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class AnchorExchanger
     {
-
+#if !UNITY_EDITOR
         private string baseAddress = "";
 
-        public Dictionary<string, int> anchorkeys = new Dictionary<string, int>();
+        private List<string> anchorkeys = new List<string>();
 
-        public Dictionary<string, int> AnchorKeys
+        public List<string> AnchorKeys
         {
             get
             {
                 lock (anchorkeys)
                 {
-                    return new Dictionary<string, int>(anchorkeys);
+                    return new List<string>(anchorkeys);
                 }
             }
         }
@@ -31,35 +31,22 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             baseAddress = exchangerUrl;
             Task.Factory.StartNew(async () =>
                 {
+                    string previousKey = string.Empty;
                     while (true)
                     {
-                        for (int i = 1; 1<5; i++)
+                        string currentKey = await RetrieveLastAnchorKey();
+                        if (!string.IsNullOrWhiteSpace(currentKey) && currentKey != previousKey)
                         {
-                            string currentKey = await RetrieveAnchorKey(i);
-                            int currentType = await RetrieveAnchorType(i);
-                            if (!string.IsNullOrWhiteSpace(currentKey))
+                            Debug.Log("Found key " + currentKey);
+                            lock (anchorkeys)
                             {
-                                Debug.Log("Found key " + currentKey);
-                                lock (anchorkeys)
-                                {
-                                    anchorkeys.Add(currentKey, currentType);
-                                }
+                                anchorkeys.Add(currentKey);
                             }
-                            await Task.Delay(500);
+                            previousKey = currentKey;
                         }
                         await Task.Delay(500);
                     }
                 }, TaskCreationOptions.LongRunning);
-        }
-        public int anchorType(string anchorKey)
-        {
-            int defaultType = 1;
-            
-            if (anchorkeys.ContainsKey(anchorKey))
-            {
-                return anchorkeys[anchorKey];
-            }
-            return defaultType;
         }
 
         public async Task<string> RetrieveAnchorKey(long anchorNumber)
@@ -77,24 +64,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
-
-        public async Task<int> RetrieveAnchorType(long anchorNumber)
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-                return int.Parse(await client.GetStringAsync(baseAddress + "/type/" + anchorNumber.ToString()));
-
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to retrieve anchor key for anchor number: {anchorNumber}.");
-                return 0;
-            }
-        }
-
-
         public async Task<string> RetrieveLastAnchorKey()
         {
             try
@@ -107,22 +76,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 Debug.LogException(ex);
                 Debug.LogError("Failed to retrieve last anchor key.");
                 return null;
-            }
-        }
-
-        public async Task<int> RetrieveLastAnchorType()
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-                
-                return int.Parse(await client.GetStringAsync(baseAddress + "/last/type"));
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError("Failed to retrieve last anchor key.");
-                return 0;
             }
         }
 
@@ -166,6 +119,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return -1;
             }
         }
-
+#endif
     }
 }

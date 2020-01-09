@@ -33,9 +33,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Start is called on the frame when a script is enabled just before any
         /// of the Update methods are called the first time.
         /// </summary>
-        public async virtual void Start()
+        public virtual void Start()
         {
-
 #if UNITY_ANDROID || UNITY_IOS
              arRaycastManager = FindObjectOfType<ARRaycastManager>();
             if (arRaycastManager == null)
@@ -86,7 +85,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else
             {
-                OnGazeObjectInteraction(Camera.main.transform.position + Camera.main.transform.forward * 1.5f, Camera.main.transform.forward);
+                OnGazeObjectInteraction(Camera.main.transform.position + Camera.main.transform.forward * 1.5f, -Camera.main.transform.forward);
             }
         }
 
