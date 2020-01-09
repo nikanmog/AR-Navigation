@@ -255,11 +255,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
 
 
-        /// <summary>
-        /// Gets the color of the current demo step.
-        /// </summary>
-        /// <returns><see cref="Color"/>.</returns>
-        protected abstract Color GetStepColor();
 
         /// <summary>
         /// Determines whether the demo is in a mode that should place an object.
@@ -374,7 +369,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Debug.LogException(exception);
             Debug.Log("Failed to save anchor " + exception.ToString());
 
-            UnityDispatcher.InvokeOnAppThread(() => this.feedbackBox.text = string.Format("Error: {0}", exception.ToString()));
+            UnityDispatcher.InvokeOnAppThread(() => this.feedbackBox.text = string.Format("There has been an error with the ASA service. Please restart the App. Error Code:", exception.ToString()));
         }
 
         /// <summary>
@@ -590,7 +585,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         protected struct DemoStepParams
         {
-            public Color StepColor { get; set; }
             public string StepMessage { get; set; }
         }
 
