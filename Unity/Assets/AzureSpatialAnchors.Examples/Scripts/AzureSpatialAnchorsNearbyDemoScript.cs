@@ -22,29 +22,51 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Neighboring,
             ModeCount
         }
+        AppState currentAppState
+        {
+            get
+            {
+                return _currentAppState;
+            }
+            set
+            {
+                if (_currentAppState != value)
+                {
+                    Debug.LogFormat("State from {0} to {1}", _currentAppState, value);
+                    _currentAppState = value;
 
-        private AppState currentAppState = AppState.Initializing;
+                }
+            }
+        }
+        private AppState _currentAppState = AppState.Initializing;
         // Cosmos Connection
-        private string BaseSharingUrl = "";
+        public string BaseSharingUrl
+        {
+            get => baseSharingUrl;
+            set => baseSharingUrl = value;
+        }
+        private string baseSharingUrl = "";
+
+        public AnchorExchanger anchorExchanger = new AnchorExchanger();
 
         private string _anchorKeyToFind = null;
         private readonly int numToMake = 5;
 
         List<string> anchorIds = new List<string>();
         readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
-        private readonly List<GameObject> allSpawnedObjectsX = new List<GameObject>();
+        private readonly List<GameObject> allSpawnedObjects = new List<GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
 
-        Dictionary<string, GameObject> spawnedObjectsInCurrentAppStateX
+        Dictionary<string, GameObject> spawnedObjectsInCurrentAppState
         {
             get
             {
-                if (spawnedObjectsPerAppState.ContainsKey(currentAppState) == false)
+                if (spawnedObjectsPerAppState.ContainsKey(_currentAppState) == false)
                 {
-                    spawnedObjectsPerAppState.Add(currentAppState, new Dictionary<string, GameObject>());
+                    spawnedObjectsPerAppState.Add(_currentAppState, new Dictionary<string, GameObject>());
                 }
 
-                return spawnedObjectsPerAppState[currentAppState];
+                return spawnedObjectsPerAppState[_currentAppState];
             }
         }
 
@@ -54,7 +76,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public async override void Start()
         {
-            base.Start();
             BaseSharingUrl = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
             Uri result;
             if (Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
@@ -63,10 +84,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             anchorExchanger.WatchKeys(BaseSharingUrl);
 
-            anchorIds = new List<string>(anchorExchanger.anchorkeys.Keys);
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
             await setMode();
-
+            base.Start();
+            base.anchorExchanger = this.anchorExchanger;
         }
 
 
@@ -83,7 +105,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
                 else
                 {
-                    currentAppState = AppState.Placing;
+                    _currentAppState = AppState.Placing;
                 }
             }
         }
@@ -93,7 +115,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Update()
         {
-            anchorIds = new List<string>(anchorExchanger.anchorkeys.Keys);
+
+
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
+
+
+
             base.Update();
             switch (currentAppState)
             {
@@ -137,9 +164,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentCloudAnchor = args.Anchor;
                     Pose anchorPose = Pose.identity;
 
-            #if UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID || UNITY_IOS
                     anchorPose = currentCloudAnchor.GetPose();
-            #endif
+#endif
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
                     SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
@@ -273,6 +300,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected override void OnSaveCloudAnchorFailed(Exception exception)
         {
             base.OnSaveCloudAnchorFailed(exception);
+        }
+        protected override Color GetStepColor()
+        {
+            return Color.red;
         }
     }
 }
