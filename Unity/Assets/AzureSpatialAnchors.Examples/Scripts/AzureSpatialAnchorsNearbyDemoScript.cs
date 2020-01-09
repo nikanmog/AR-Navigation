@@ -40,9 +40,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         private AppState _currentAppState = AppState.Initializing;
         // Cosmos Connection
-        public string BaseSharingUrl { 
-            get => baseSharingUrl; 
-            set => baseSharingUrl = value; 
+        public string BaseSharingUrl
+        {
+            get => baseSharingUrl;
+            set => baseSharingUrl = value;
         }
         private string baseSharingUrl = "";
 
@@ -75,59 +76,28 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public async override void Start()
         {
-
-            SpatialAnchorSamplesConfig samplesConfig = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig");
-            if (string.IsNullOrWhiteSpace(BaseSharingUrl) && samplesConfig != null)
+            BaseSharingUrl = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
+            Uri result;
+            if (Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
             {
-                BaseSharingUrl = samplesConfig.BaseSharingURL;
+                BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
             }
-
-            if (string.IsNullOrEmpty(BaseSharingUrl))
-            {
-                feedbackBox.text = $"Need to set {nameof(BaseSharingUrl)}.";
-                XRUXPickerForSharedAnchorDemo.Instance.GetDemoButtons()[1].gameObject.SetActive(false);
-                XRUXPickerForSharedAnchorDemo.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
-                XRUXPickerForSharedAnchorDemo.Instance.GetDemoInputField().gameObject.SetActive(false);
-                return;
-            }
-            else
-            {
-                Uri result;
-                if (!Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
-                {
-                    feedbackBox.text = $"{nameof(BaseSharingUrl)} is not a valid url";
-                    return;
-                }
-                else
-                {
-                    BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
-                }
-            }
-
             anchorExchanger.WatchKeys(BaseSharingUrl);
-            
-            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
             await setMode();
             base.Start();
-            
-            if (!SanityCheckAccessConfiguration())
-            {
-                return;
-            }
             base.anchorExchanger = this.anchorExchanger;
-            
         }
 
 
         private async Task setMode()
         {
-           await AdvanceDemoAsync();
+            await AdvanceDemoAsync();
 
             {
-
-                            _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1); 
+                _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1);
 
                 if (_anchorKeyToFind != null)
                 {
@@ -147,7 +117,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
 
 
-                            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
 
 
@@ -171,7 +141,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     scanImage.SetActive(false);
                     // We should find all anchors except for the anchor we are using as the source anchor.
                     feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
-                    
+
                     if (locatedCount == numToMake - 1)
                     {
                         feedbackBox.text = "";
@@ -193,10 +163,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     locatedCount++;
                     currentCloudAnchor = args.Anchor;
                     Pose anchorPose = Pose.identity;
-                    
-                    #if UNITY_ANDROID || UNITY_IOS
+
+#if UNITY_ANDROID || UNITY_IOS
                     anchorPose = currentCloudAnchor.GetPose();
-                    #endif
+#endif
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
                     SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
@@ -233,12 +203,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
 
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
             {
                 spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
             }
-            #endif
+#endif
         }
 
         public async override Task AdvanceDemoAsync()
@@ -278,7 +248,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Neighboring;
                     break;
-                    
+
             }
         }
 
@@ -294,17 +264,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             anchorIds.Add(currentCloudAnchor.Identifier);
 
-                        anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
-            
+            anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
+
             // Sanity check that the object is still where we expect
             Pose anchorPose = Pose.identity;
 
-            #if UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID || UNITY_IOS
             anchorPose = currentCloudAnchor.GetPose();
-            #endif
+#endif
             // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
-            
+
             SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
 
             spawnedObject = null;
