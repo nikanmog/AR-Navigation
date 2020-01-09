@@ -10,10 +10,339 @@ using UnityEngine.UI;
 
 namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
-    public abstract class DemoScriptBase : InputInteractionBase
+    public class DemoScriptBase : InputInteractionBase
     {
-        #region Member Variables
-        private Task advanceDemoTask = null;
+
+
+
+        //App States
+        internal enum AppState
+        {
+            Placing = 0,
+            Saving,
+            Initializing,
+            ReadyToSearch,
+            Searching,
+            ReadyToNeighborQuery,
+            Neighboring,
+            ModeCount
+        }
+        AppState currentAppState
+        {
+            get
+            {
+                return _currentAppState;
+            }
+            set
+            {
+                if (_currentAppState != value)
+                {
+                    Debug.LogFormat("State from {0} to {1}", _currentAppState, value);
+                    _currentAppState = value;
+
+                }
+            }
+        }
+        private AppState _currentAppState = AppState.Initializing;
+        // Cosmos Connection
+        public string BaseSharingUrl
+        {
+            get => baseSharingUrl;
+            set => baseSharingUrl = value;
+        }
+        private string baseSharingUrl = "";
+
+        public AnchorExchanger anchorExchanger = new AnchorExchanger();
+
+        private string _anchorKeyToFind = null;
+        private readonly int numToMake = 5;
+
+        List<string> anchorIds = new List<string>();
+        readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
+        private readonly List<GameObject> allSpawnedObjects = new List<GameObject>();
+        private readonly List<Material> allSpawnedMaterials = new List<Material>();
+
+        Dictionary<string, GameObject> spawnedObjectsInCurrentAppState
+        {
+            get
+            {
+                if (spawnedObjectsPerAppState.ContainsKey(_currentAppState) == false)
+                {
+                    spawnedObjectsPerAppState.Add(_currentAppState, new Dictionary<string, GameObject>());
+                }
+
+                return spawnedObjectsPerAppState[_currentAppState];
+            }
+        }
+
+        /// <summary>
+        /// Start is called on the frame when a script is enabled just before any
+        /// of the Update methods are called the first time.
+        /// </summary>
+        public async override void Start()
+        {
+
+            BaseSharingUrl = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
+            Uri result;
+            if (Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
+            {
+                BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
+            }
+            anchorExchanger.WatchKeys(BaseSharingUrl);
+
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
+
+            await setMode();
+
+
+
+            feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            scanImage = XRUXPicker.Instance.GetOrientation();
+            if (feedbackBox == null)
+            {
+                Debug.Log($"{nameof(feedbackBox)} not found in scene by XRUXPicker.");
+                Destroy(this);
+                return;
+            }
+
+       
+
+
+
+            CloudManager.SessionUpdated += CloudManager_SessionUpdated;
+            CloudManager.AnchorLocated += CloudManager_AnchorLocated;
+            CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
+            CloudManager.LogDebug += CloudManager_LogDebug;
+            CloudManager.Error += CloudManager_Error;
+
+            anchorLocateCriteria = new AnchorLocateCriteria();
+
+            base.Start();
+        }
+
+
+        private async Task setMode()
+        {
+            await AdvanceDemoAsync();
+
+            {
+                _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1);
+
+                if (_anchorKeyToFind != null)
+                {
+                    currentAppState = AppState.ReadyToSearch;
+                }
+                else
+                {
+                    _currentAppState = AppState.Placing;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update is called every frame, if the MonoBehaviour is enabled.
+        /// </summary>
+        public override void Update()
+        {
+
+
+            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
+
+
+
+            base.Update();
+            switch (currentAppState)
+            {
+                case AppState.Searching:
+                    scanImage.SetActive(true);
+                    feedbackBox.text = "Please go to the starting point and look around.";
+                    //scanImage.SetActive(true);
+                    break;
+                case AppState.Initializing:
+                    scanImage.SetActive(false);
+                    feedbackBox.text = "Initializing...";
+                    break;
+                case AppState.ReadyToNeighborQuery:
+                    scanImage.SetActive(false);
+                    feedbackBox.text = "Tap to continue";
+                    break;
+                case AppState.Neighboring:
+                    scanImage.SetActive(false);
+                    // We should find all anchors except for the anchor we are using as the source anchor.
+                    feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
+
+                    if (locatedCount == numToMake - 1)
+                    {
+                        feedbackBox.text = "";
+                    }
+                    break;
+            }
+        }
+
+        private int locatedCount = 0;
+
+        protected void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
+        {
+
+            if (args.Status == LocateAnchorStatus.Located)
+            {
+                UnityDispatcher.InvokeOnAppThread(() =>
+                {
+                    locatedCount++;
+                    currentCloudAnchor = args.Anchor;
+                    Pose anchorPose = Pose.identity;
+
+#if UNITY_ANDROID || UNITY_IOS
+                    anchorPose = currentCloudAnchor.GetPose();
+#endif
+                    // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+
+                    SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
+
+                    spawnedObject = null;
+
+                    if (currentAppState == AppState.Searching)
+                    {
+                        currentAppState = AppState.ReadyToNeighborQuery;
+                    }
+                });
+            }
+        }
+
+        protected void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
+        {
+            if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier))
+            {
+                spawnedObject = spawnedObjectsInCurrentAppState[currentCloudAnchor.Identifier];
+            }
+
+            bool spawnedNewObject = spawnedObject == null;
+
+
+
+
+            SpawnOrMoveCurrentAnchoredObjectX(worldPos, worldRot);
+
+
+
+            if (spawnedNewObject)
+            {
+                allSpawnedObjects.Add(spawnedObject);
+                allSpawnedMaterials.Add(spawnedObjectMat);
+
+                if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
+                {
+                    spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
+                }
+            }
+
+#if WINDOWS_UWP || UNITY_WSA
+            if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
+            {
+                spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
+            }
+#endif
+        }
+
+        public async Task AdvanceDemoAsync()
+        {
+            switch (currentAppState)
+            {
+                case AppState.Placing:
+                    if (spawnedObject != null)
+                    {
+                        currentAppState = AppState.Saving;
+                        if (!CloudManager.IsSessionStarted)
+                        {
+                            await CloudManager.StartSessionAsync();
+                        }
+                        await SaveCurrentObjectAnchorToCloudAsync();
+                    }
+                    break;
+                case AppState.ReadyToSearch:
+                    if (!CloudManager.IsSessionStarted)
+                    {
+                        await CloudManager.StartSessionAsync();
+                    }
+                    await CloudManager.ResetSessionAsync();
+                    await CloudManager.StartSessionAsync();
+                    SetGraphEnabled(false);
+                    IEnumerable<string> anchorsToFind = anchorIds;
+                    SetAnchorIdsToLocate(anchorsToFind);
+                    locatedCount = 0;
+                    currentWatcher = CreateWatcher();
+                    currentAppState = AppState.Searching;
+                    break;
+                case AppState.ReadyToNeighborQuery:
+                    SetGraphEnabled(true);
+                    ResetAnchorIdsToLocate();
+                    SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
+                    locatedCount = 0;
+                    currentWatcher = CreateWatcher();
+                    currentAppState = AppState.Neighboring;
+                    break;
+
+            }
+        }
+
+        protected async Task OnSaveCloudAnchorSuccessfulAsync()
+        {
+         
+
+            Debug.Log("Anchor created, yay!");
+
+            anchorIds.Add(currentCloudAnchor.Identifier);
+
+            long anchorNumber = -1;
+
+            anchorIds.Add(currentCloudAnchor.Identifier);
+
+            anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
+
+            // Sanity check that the object is still where we expect
+            Pose anchorPose = Pose.identity;
+
+#if UNITY_ANDROID || UNITY_IOS
+            anchorPose = currentCloudAnchor.GetPose();
+#endif
+            // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+
+
+            SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
+
+            spawnedObject = null;
+            currentCloudAnchor = null;
+            if (allSpawnedObjects.Count < numToMake)
+            {
+                feedbackBox.text = $"Saved...Make another {allSpawnedObjects.Count}/{numToMake} ";
+                currentAppState = AppState.Placing;
+                CloudManager.StopSession();
+            }
+            else
+            {
+                feedbackBox.text = "Saved... ready to start finding them.";
+                CloudManager.StopSession();
+                currentAppState = AppState.ReadyToSearch;
+            }
+        }
+
+        protected bool IsPlacingObject()
+        {
+            return currentAppState == AppState.Placing;
+        }
+        protected void OnSaveCloudAnchorFailed(Exception exception)
+        {
+            OnSaveCloudAnchorFailed(exception);
+        }
+
+    
+
+
+
+
+
+    #region Member Variables
+    private Task advanceDemoTask = null;
         protected bool isErrorActive = false;
         protected Text feedbackBox;
         protected GameObject scanImage;
@@ -23,7 +352,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected CloudSpatialAnchorWatcher currentWatcher;
         protected GameObject spawnedObject = null;
         protected Material spawnedObjectMat = null;
-        protected AnchorExchanger anchorExchanger = null;
+
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -91,50 +420,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             return true;
         }
 
-        /// <summary>
-        /// Start is called on the frame when a script is enabled just before any
-        /// of the Update methods are called the first time.
-        /// </summary>
-        public async override void Start()
-        {
-            feedbackBox = XRUXPicker.Instance.GetFeedbackText();
-            scanImage = XRUXPicker.Instance.GetOrientation();
-            if (feedbackBox == null)
-            {
-                Debug.Log($"{nameof(feedbackBox)} not found in scene by XRUXPicker.");
-                Destroy(this);
-                return;
-            }
-            
-            if (CloudManager == null)
-            {
-                Debug.Break();
-                feedbackBox.text = $"{nameof(CloudManager)} reference has not been set. Make sure it has been added to the scene and wired up to {this.name}.";
-                return;
-            }
-
-            if (!SanityCheckAccessConfiguration())
-            {
-                feedbackBox.text = $"{nameof(SpatialAnchorManager.SpatialAnchorsAccountId)} and {nameof(SpatialAnchorManager.SpatialAnchorsAccountKey)} must be set on {nameof(SpatialAnchorManager)}";
-            }
-
-
-            if (AnchoredObjectPrefab == null)
-            {
-                feedbackBox.text = "CreationTarget must be set on the demo script.";
-                return;
-            }
-
-            CloudManager.SessionUpdated += CloudManager_SessionUpdated;
-            CloudManager.AnchorLocated += CloudManager_AnchorLocated;
-            CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
-            CloudManager.LogDebug += CloudManager_LogDebug;
-            CloudManager.Error += CloudManager_Error;
-
-            anchorLocateCriteria = new AnchorLocateCriteria();
-
-            base.Start();
-        }
 
         /// <summary>
         /// Advances the demo.
@@ -142,7 +427,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <returns>
         /// A <see cref="Task"/> that represents the operation.
         /// </returns>
-        public abstract Task AdvanceDemoAsync();
+
 
         /// <summary>
         /// This version only exists for Unity to wire up a button click to.
@@ -244,29 +529,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                                             LocateStrategy.VisualInformation;
         }
 
-        /// <summary>
-        /// Bypassing the cache will force new queries to be sent for objects, allowing
-        /// for refined poses over time.
-        /// </summary>
-        /// <param name="BypassCache"></param>
-        public void SetBypassCache(bool BypassCache)
-        {
-            anchorLocateCriteria.BypassCache = BypassCache;
-        }
 
-
-        /// <summary>
-        /// Gets the color of the current demo step.
-        /// </summary>
-        /// <returns><see cref="Color"/>.</returns>
-        protected abstract Color GetStepColor();
 
         /// <summary>
         /// Determines whether the demo is in a mode that should place an object.
         /// </summary>
         /// <returns><c>true</c> to place; otherwise, <c>false</c>.</returns>
-        protected abstract bool IsPlacingObject();
-
+   
         /// <summary>
         /// Moves the specified anchored object.
         /// </summary>
@@ -303,10 +572,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Called when a cloud anchor is located.
         /// </summary>
         /// <param name="args">The <see cref="AnchorLocatedEventArgs"/> instance containing the event data.</param>
-        protected virtual void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
-        {
-            // To be overridden.
-        }
+   
 
         /// <summary>
         /// Called when cloud anchor location has completed.
@@ -320,10 +586,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <summary>
         /// Called when the current cloud session is updated.
         /// </summary>
-        protected virtual void OnCloudSessionUpdated()
-        {
-            // To be overridden.
-        }
+
 
         /// <summary>
         /// Called when gaze interaction occurs.
@@ -367,7 +630,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Called when a cloud anchor is not saved successfully.
         /// </summary>
         /// <param name="exception">The exception.</param>
-        protected virtual void OnSaveCloudAnchorFailed(Exception exception)
+        protected virtual void OnSaveCloudAnchorFailedB(Exception exception)
         {
             // we will block the next step to show the exception message in the UI.
             isErrorActive = true;
@@ -380,11 +643,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <summary>
         /// Called when a cloud anchor is saved successfully.
         /// </summary>
-        protected virtual Task OnSaveCloudAnchorSuccessfulAsync()
-        {
-            // To be overridden.
-            return Task.CompletedTask;
-        }
+
 
         /// <summary>
         /// Called when a select interaction occurs.
@@ -476,12 +735,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
                 else
                 {
-                    OnSaveCloudAnchorFailed(new Exception("Failed to save, but no exception was thrown."));
+                    OnSaveCloudAnchorFailedB(new Exception("Failed to save, but no exception was thrown."));
                 }
             }
             catch (Exception ex)
             {
-                OnSaveCloudAnchorFailed(ex);
+                OnSaveCloudAnchorFailedB(ex);
             }
         }
 
@@ -537,7 +796,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         /// <param name="worldPos">The world position.</param>
         /// <param name="worldRot">The world rotation.</param>
-        protected virtual void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
+        protected virtual void SpawnOrMoveCurrentAnchoredObjectX(Vector3 worldPos, Quaternion worldRot)
         {
             // Create the object if we need to, and attach the platform appropriate
             // Anchor behavior to the spawned object
@@ -572,7 +831,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         private void CloudManager_SessionUpdated(object sender, SessionUpdatedEventArgs args)
         {
-            OnCloudSessionUpdated();
+
         }
 
         private void CloudManager_Error(object sender, SessionErrorEventArgs args)
@@ -588,11 +847,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Debug.Log(args.Message);
         }
 
-        protected struct DemoStepParams
-        {
-            public Color StepColor { get; set; }
-            public string StepMessage { get; set; }
-        }
 
 
         #region Public Properties
