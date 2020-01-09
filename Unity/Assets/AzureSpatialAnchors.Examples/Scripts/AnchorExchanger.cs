@@ -45,9 +45,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                                     anchorkeys.Add(currentKey, currentType);
                                 }
                             }
-                            await Task.Delay(500);
                         }
-                        await Task.Delay(500);
                     }
                 }, TaskCreationOptions.LongRunning);
         }

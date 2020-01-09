@@ -12,8 +12,50 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class ARNavigation : InputInteractionBase
     {
+        #region Member Variables
+        private Task advanceDemoTask = null;
+        protected bool isErrorActive = false;
+        protected Text feedbackBox;
+        //protected GameObject scanImage;
+        protected readonly List<string> anchorIdsToLocate = new List<string>();
+        protected AnchorLocateCriteria anchorLocateCriteria = null;
+        protected CloudSpatialAnchor currentCloudAnchor;
+        protected CloudSpatialAnchorWatcher currentWatcher;
+        protected GameObject spawnedObject = null;
+        protected Material spawnedObjectMat = null;
 
+        #endregion // Member Variables
 
+        #region Unity Inspector Variables
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab0 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab1 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab2 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab3 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab4 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab5 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab6 = null;
+        [SerializeField]
+        [Tooltip("The prefab used to represent an anchored object.")]
+        private GameObject anchoredObjectPrefab7 = null;
+
+        [SerializeField]
+        [Tooltip("SpatialAnchorManager instance to use for this demo. This is required.")]
+        private SpatialAnchorManager cloudManager = null;
+        #endregion // Unity Inspector Variables
 
         //App States
         internal enum AppState
@@ -27,23 +69,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Neighboring,
             ModeCount
         }
-        AppState currentAppState
-        {
-            get
-            {
-                return _currentAppState;
-            }
-            set
-            {
-                if (_currentAppState != value)
-                {
-                    Debug.LogFormat("State from {0} to {1}", _currentAppState, value);
-                    _currentAppState = value;
 
-                }
-            }
-        }
-        private AppState _currentAppState = AppState.Initializing;
+        private AppState currentAppState = AppState.Initializing;
         // Cosmos Connection
         public string BaseSharingUrl
         {
@@ -66,12 +93,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             get
             {
-                if (spawnedObjectsPerAppState.ContainsKey(_currentAppState) == false)
+                if (spawnedObjectsPerAppState.ContainsKey(currentAppState) == false)
                 {
-                    spawnedObjectsPerAppState.Add(_currentAppState, new Dictionary<string, GameObject>());
+                    spawnedObjectsPerAppState.Add(currentAppState, new Dictionary<string, GameObject>());
                 }
 
-                return spawnedObjectsPerAppState[_currentAppState];
+                return spawnedObjectsPerAppState[currentAppState];
             }
         }
 
@@ -126,34 +153,35 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             await AdvanceDemoAsync();
 
             {
+                printmsg = "query";
                 _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(1);
-
+                printmsg = "querydone";
                 if (_anchorKeyToFind != null)
                 {
+                    printmsg = "queryA";
                     currentAppState = AppState.ReadyToSearch;
                 }
                 else
                 {
-                    _currentAppState = AppState.Placing;
+                    printmsg = "queryB";
+                    currentAppState = AppState.Placing;
                 }
             }
         }
-
+        private string printmsg = "";
         /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         public override void Update()
         {
 
-
+            feedbackBox.text = $"Mode: {currentAppState}, AnchorIDs Count: {anchorIds.Count}, locatedCount: {locatedCount}, print: {printmsg}";
             anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
-
-
 
             base.Update();
             switch (currentAppState)
             {
-                case AppState.Searching:
+                /*case AppState.Searching:
                    // scanImage.SetActive(true);
                     feedbackBox.text = "Please go to the starting point and look around.";
                     //scanImage.SetActive(true);
@@ -166,6 +194,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     //scanImage.SetActive(false);
                     feedbackBox.text = "Tap to continue";
                     break;
+                */
                 case AppState.Neighboring:
                   //  scanImage.SetActive(false);
                     // We should find all anchors except for the anchor we are using as the source anchor.
@@ -249,6 +278,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             switch (currentAppState)
             {
                 case AppState.Placing:
+                    printmsg = "adv1a";
                     if (spawnedObject != null)
                     {
                         currentAppState = AppState.Saving;
@@ -258,8 +288,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                         }
                         await SaveCurrentObjectAnchorToCloudAsync();
                     }
+                    printmsg = "adv1b";
                     break;
                 case AppState.ReadyToSearch:
+                    printmsg = "adv2a";
                     if (!CloudManager.IsSessionStarted)
                     {
                         await CloudManager.StartSessionAsync();
@@ -272,14 +304,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Searching;
+                    printmsg = "adv2b";
                     break;
                 case AppState.ReadyToNeighborQuery:
+                    printmsg = "adv3a";
                     SetGraphEnabled(true);
                     ResetAnchorIdsToLocate();
                     SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Neighboring;
+                    printmsg = "adv3b";
                     break;
 
             }
@@ -341,51 +376,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
 
 
-    #region Member Variables
-    private Task advanceDemoTask = null;
-        protected bool isErrorActive = false;
-        protected Text feedbackBox;
-        //protected GameObject scanImage;
-        protected readonly List<string> anchorIdsToLocate = new List<string>();
-        protected AnchorLocateCriteria anchorLocateCriteria = null;
-        protected CloudSpatialAnchor currentCloudAnchor;
-        protected CloudSpatialAnchorWatcher currentWatcher;
-        protected GameObject spawnedObject = null;
-        protected Material spawnedObjectMat = null;
+   
 
-        #endregion // Member Variables
-
-        #region Unity Inspector Variables
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab0 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab1 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab2 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab3 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab4 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab5 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab6 = null;
-        [SerializeField]
-        [Tooltip("The prefab used to represent an anchored object.")]
-        private GameObject anchoredObjectPrefab7 = null;
-
-        [SerializeField]
-        [Tooltip("SpatialAnchorManager instance to use for this demo. This is required.")]
-        private SpatialAnchorManager cloudManager = null;
-        #endregion // Unity Inspector Variables
-        private int counter = 0;
         /// <summary>
         /// Destroying the attached Behaviour will result in the game or Scene
         /// receiving OnDestroy.
@@ -410,15 +402,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             base.OnDestroy();
         }
 
-        public virtual bool SanityCheckAccessConfiguration()
-        {
-            if (string.IsNullOrWhiteSpace(CloudManager.SpatialAnchorsAccountId) || string.IsNullOrWhiteSpace(CloudManager.SpatialAnchorsAccountKey))
-            {
-                return false;
-            }
-
-            return true;
-        }
 
 
         /// <summary>
