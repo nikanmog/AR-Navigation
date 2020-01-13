@@ -78,7 +78,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public AnchorExchanger anchorExchanger = new AnchorExchanger();
 
         private string _anchorKeyToFind = null;
-        private readonly int numToMake = 5;
+        private readonly int numToMake = 7;
 
         List<string> anchorIds = new List<string>();
         private Dictionary<string, GameObject> spawnedObjects = new Dictionary<string, GameObject>();
@@ -99,14 +99,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
             }
-            anchorExchanger.WatchKeys(BaseSharingUrl);
+            await anchorExchanger.WatchKeys(BaseSharingUrl);
 
             anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
             await setMode();
-
-
-
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             //scanImage = XRUXPicker.Instance.GetOrientation();
             if (feedbackBox == null)
@@ -115,11 +112,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 Destroy(this);
                 return;
             }
-
-       
-
-
-
             CloudManager.SessionUpdated += CloudManager_SessionUpdated;
             CloudManager.AnchorLocated += CloudManager_AnchorLocated;
             CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
