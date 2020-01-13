@@ -72,12 +72,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         private AppState currentAppState = AppState.Initializing;
         // Cosmos Connection
-        public string BaseSharingUrl
-        {
-            get => baseSharingUrl;
-            set => baseSharingUrl = value;
-        }
-        private string baseSharingUrl = "";
+
+        public string BaseSharingUrl = "";
 
         public AnchorExchanger anchorExchanger = new AnchorExchanger();
 
@@ -85,22 +81,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private readonly int numToMake = 7;
 
         List<string> anchorIds = new List<string>();
-        readonly Dictionary<AppState, Dictionary<string, GameObject>> spawnedObjectsPerAppState = new Dictionary<AppState, Dictionary<string, GameObject>>();
-        private readonly List<GameObject> allSpawnedObjects = new List<GameObject>();
+        private Dictionary<string, GameObject> spawnedObjects = new Dictionary<string, GameObject>();
+
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
 
-        Dictionary<string, GameObject> spawnedObjectsInCurrentAppState
-        {
-            get
-            {
-                if (spawnedObjectsPerAppState.ContainsKey(currentAppState) == false)
-                {
-                    spawnedObjectsPerAppState.Add(currentAppState, new Dictionary<string, GameObject>());
-                }
-
-                return spawnedObjectsPerAppState[currentAppState];
-            }
-        }
 
         /// <summary>
         /// Start is called on the frame when a script is enabled just before any
@@ -232,9 +216,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         protected void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
         {
-            if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier))
+
+            if (currentCloudAnchor != null && spawnedObjects.ContainsKey(currentCloudAnchor.Identifier))
             {
-                spawnedObject = spawnedObjectsInCurrentAppState[currentCloudAnchor.Identifier];
+                spawnedObject = spawnedObjects[currentCloudAnchor.Identifier];
             }
 
             bool spawnedNewObject = spawnedObject == null;
@@ -248,12 +233,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             if (spawnedNewObject)
             {
-                allSpawnedObjects.Add(spawnedObject);
                 allSpawnedMaterials.Add(spawnedObjectMat);
 
-                if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
+                if (currentCloudAnchor != null && spawnedObjects.ContainsKey(currentCloudAnchor.Identifier) == false)
                 {
-                    spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
+                    spawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
                 }
             }
 
@@ -339,9 +323,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             spawnedObject = null;
             currentCloudAnchor = null;
-            if (allSpawnedObjects.Count < numToMake)
+            
+            if (spawnedObjects.Count < numToMake)
             {
-                feedbackBox.text = $"Saved...Make another {allSpawnedObjects.Count}/{numToMake} ";
+                feedbackBox.text = $"Saved...Make another {spawnedObjects.Count}/{numToMake} ";
                 currentAppState = AppState.Placing;
                 CloudManager.StopSession();
             }

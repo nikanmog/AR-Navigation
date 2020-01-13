@@ -43,6 +43,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                                     anchorkeys.Add(currentKey, currentType);
                                 }
                             }
+                            
                         }
 
         }
