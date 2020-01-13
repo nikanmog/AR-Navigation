@@ -26,14 +26,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
-        public void WatchKeys(string exchangerUrl)
+        public async Task WatchKeys(string exchangerUrl)
         {
+            int anchorAmount = await RetrieveAnchorAmount();
             baseAddress = exchangerUrl;
-            Task.Factory.StartNew(async () =>
-                {
-                    while (true)
-                    {
-                        for (int i = 1; 1<5; i++)
+
+                        for (int i = 1; 1<=anchorAmount; i++)
                         {
                             string currentKey = await RetrieveAnchorKey(i);
                             int currentType = await RetrieveAnchorType(i);
@@ -46,8 +44,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                                 }
                             }
                         }
-                    }
-                }, TaskCreationOptions.LongRunning);
+
         }
         public int anchorType(string anchorKey)
         {
@@ -93,28 +90,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
 
 
-        public async Task<string> RetrieveLastAnchorKey()
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-                return await client.GetStringAsync(baseAddress + "/last");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError("Failed to retrieve last anchor key.");
-                return null;
-            }
-        }
-
-        public async Task<int> RetrieveLastAnchorType()
+        public async Task<int> RetrieveAnchorAmount()
         {
             try
             {
                 HttpClient client = new HttpClient();
                 
-                return int.Parse(await client.GetStringAsync(baseAddress + "/last/type"));
+                return int.Parse(await client.GetStringAsync(baseAddress + "/count"));
             }
             catch (Exception ex)
             {

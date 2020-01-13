@@ -59,6 +59,20 @@ namespace SharingService.Controllers
             }
         }
 
+        // GET api/anchors/last
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> GetCountAsync()
+        {
+            // Get the last anchor
+            AnchorCacheEntity anchor = await this.anchorKeyCache.GetLastAnchorAsync();
+
+            if (anchor == null)
+            {
+                return 0;
+            }
+
+            return int.Parse(anchor.RowKey);
+        }
 
         // GET api/anchors/last
         [HttpGet("last")]
