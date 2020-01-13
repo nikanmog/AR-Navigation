@@ -29,7 +29,7 @@ namespace SharingService.Controllers
 
 
         // GET api/anchors/5
-        [HttpGet("{anchorNumber}")]
+        [HttpGet("{anchorNumber}/key")]
         public async Task<ActionResult<string>> GetAsync(long anchorNumber)
         {
             // Get the key if present
@@ -45,7 +45,7 @@ namespace SharingService.Controllers
 
 
         // GET api/type/5
-        [HttpGet("type/{anchorNumber}")]
+        [HttpGet("{anchorNumber}/type")]
         public async Task<ActionResult<int>> GetTypeAsync(long anchorNumber)
         {
             // Get the key if present
@@ -73,30 +73,6 @@ namespace SharingService.Controllers
 
             return int.Parse(anchor.RowKey);
         }
-
-        // GET api/anchors/last
-        [HttpGet("last")]
-        public async Task<ActionResult<string>> GetAsync()
-        {
-            // Get the last anchor
-            string anchorKey = await this.anchorKeyCache.GetLastAnchorKeyAsync();
-
-            if (anchorKey == null)
-            {
-                return "";
-            }
-
-            return anchorKey;
-        }
-
-        // GET api/anchors/last/type
-        [HttpGet("last/type")]
-        public async Task<ActionResult<int>> GetTypeAsync()
-        {
-            int anchortype = await this.anchorKeyCache.GetLastAnchorTypeAsync();
-            return anchortype;
-        }
-
 
         // POST api/anchors
         [HttpPost]
@@ -130,7 +106,6 @@ namespace SharingService.Controllers
         [HttpPost("update")]
         public void UpdateAsync()
         {
-
             this.anchorKeyCache.UpdateTable();
         }
 
