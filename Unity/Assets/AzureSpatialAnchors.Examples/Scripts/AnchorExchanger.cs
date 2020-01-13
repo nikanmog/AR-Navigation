@@ -26,15 +26,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
-
+        public int anchorAmount = -1;
 
         public void GetAnchors(string exchangerUrl, ARNavigation arnavigation)
         {
 
+
             baseAddress = exchangerUrl;
             Task.Factory.StartNew(async () =>
             {
-                int anchorAmount = await RetrieveAnchorAmount();
+                anchorAmount = await RetrieveAnchorAmount();
                 for (int i = 1; 1 <= anchorAmount ; i++)
                 {
                     string currentKey = await RetrieveAnchorKey(i);
@@ -47,14 +48,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                             anchorkeys.Add(currentKey, currentType);
                         }
                     }
-                }
-                if (anchorAmount == 0)
-                {
-                    arnavigation.currentAppState = ARNavigation.AppState.Placing;
-                }
-                else if (anchorAmount == anchorkeys.Count)
-                {
-                    arnavigation.currentAppState = ARNavigation.AppState.ReadyToSearch;
                 }
             }, TaskCreationOptions.LongRunning);
         }

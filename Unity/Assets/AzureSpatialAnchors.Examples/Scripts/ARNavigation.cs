@@ -123,20 +123,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             base.Update();
             switch (currentAppState)
             {
-                /*case AppState.Searching:
-                   // scanImage.SetActive(true);
-                    feedbackBox.text = "Please go to the starting point and look around.";
-                    //scanImage.SetActive(true);
-                    break;
                 case AppState.Initializing:
-                   // scanImage.SetActive(false);
-                    feedbackBox.text = "Initializing...";
+                    if (anchorExchanger.anchorAmount == 0)
+                    {
+                        currentAppState = AppState.Placing;
+                    }
+                    if (anchorIds.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
+                    {
+                        currentAppState = AppState.ReadyToSearch;
+                    }
                     break;
-                case AppState.ReadyToNeighborQuery:
-                    //scanImage.SetActive(false);
-                    feedbackBox.text = "Tap to continue";
-                    break;
-                */
                 case AppState.Neighboring:
                     //  scanImage.SetActive(false);
                     // We should find all anchors except for the anchor we are using as the source anchor.
@@ -147,6 +143,21 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                         feedbackBox.text = "";
                     }
                     break;
+
+                    /*case AppState.Searching:
+       // scanImage.SetActive(true);
+        feedbackBox.text = "Please go to the starting point and look around.";
+        //scanImage.SetActive(true);
+        break;
+    case AppState.Initializing:
+       // scanImage.SetActive(false);
+        feedbackBox.text = "Initializing...";
+        break;
+    case AppState.ReadyToNeighborQuery:
+        //scanImage.SetActive(false);
+        feedbackBox.text = "Tap to continue";
+        break;
+    */
             }
         }
 
