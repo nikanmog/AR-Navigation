@@ -28,35 +28,36 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
 
 
-        public void WatchKeys(string exchangerUrl)
+        public void GetAnchors(string exchangerUrl, ARNavigation arnavigation)
         {
 
             baseAddress = exchangerUrl;
             Task.Factory.StartNew(async () =>
             {
                 int anchorAmount = await RetrieveAnchorAmount();
-                while (true)
+                for (int i = 1; 1 <= anchorAmount ; i++)
                 {
-                    for (int i = 1; 1 <= anchorAmount ; i++)
+                    string currentKey = await RetrieveAnchorKey(i);
+                    int currentType = await RetrieveAnchorType(i);
+                    if (!string.IsNullOrWhiteSpace(currentKey))
                     {
-                        string currentKey = await RetrieveAnchorKey(i);
-                        int currentType = await RetrieveAnchorType(i);
-                        if (!string.IsNullOrWhiteSpace(currentKey))
+                        Debug.Log("Found key " + currentKey);
+                        lock (anchorkeys)
                         {
-                            Debug.Log("Found key " + currentKey);
-                            lock (anchorkeys)
-                            {
-                                anchorkeys.Add(currentKey, currentType);
-                            }
+                            anchorkeys.Add(currentKey, currentType);
                         }
-
                     }
+                }
+                if (anchorAmount == 0)
+                {
+                    arnavigation.currentAppState = ARNavigation.AppState.Placing;
+                }
+                else if (anchorAmount == anchorkeys.Count)
+                {
+                    arnavigation.currentAppState = ARNavigation.AppState.ReadyToSearch;
                 }
             }, TaskCreationOptions.LongRunning);
         }
-
-
-
 
         
         public int anchorType(string anchorKey)
