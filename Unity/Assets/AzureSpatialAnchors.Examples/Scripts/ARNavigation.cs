@@ -78,7 +78,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public AnchorExchanger anchorExchanger = new AnchorExchanger();
 
         private string _anchorKeyToFind = null;
-        private readonly int numToMake = 5;
+        private readonly int numToMake = 7;
 
         List<string> anchorIds = new List<string>();
         private Dictionary<string, GameObject> spawnedObjects = new Dictionary<string, GameObject>();
@@ -104,9 +104,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
             await setMode();
-
-
-
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             //scanImage = XRUXPicker.Instance.GetOrientation();
             if (feedbackBox == null)
@@ -115,11 +112,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 Destroy(this);
                 return;
             }
-
-       
-
-
-
             CloudManager.SessionUpdated += CloudManager_SessionUpdated;
             CloudManager.AnchorLocated += CloudManager_AnchorLocated;
             CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
@@ -180,7 +172,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     break;
                 */
                 case AppState.Neighboring:
-                  //  scanImage.SetActive(false);
+                    //  scanImage.SetActive(false);
                     // We should find all anchors except for the anchor we are using as the source anchor.
                     feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
 
@@ -306,7 +298,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         protected async Task OnSaveCloudAnchorSuccessfulAsync()
         {
-         
+
 
             Debug.Log("Anchor created, yay!");
 
@@ -331,7 +323,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             spawnedObject = null;
             currentCloudAnchor = null;
-            
+
             if (spawnedObjects.Count < numToMake)
             {
                 feedbackBox.text = $"Saved...Make another {spawnedObjects.Count}/{numToMake} ";
@@ -355,13 +347,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             OnSaveCloudAnchorFailed(exception);
         }
 
-    
 
 
 
 
 
-   
+
+
 
         /// <summary>
         /// Destroying the attached Behaviour will result in the game or Scene
@@ -503,7 +495,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Determines whether the demo is in a mode that should place an object.
         /// </summary>
         /// <returns><c>true</c> to place; otherwise, <c>false</c>.</returns>
-   
+
         /// <summary>
         /// Moves the specified anchored object.
         /// </summary>
@@ -540,7 +532,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Called when a cloud anchor is located.
         /// </summary>
         /// <param name="args">The <see cref="AnchorLocatedEventArgs"/> instance containing the event data.</param>
-   
+
 
         /// <summary>
         /// Called when cloud anchor location has completed.
@@ -561,13 +553,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         protected override void OnGazeInteraction()
         {
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             // HoloLens gaze interaction
             if (IsPlacingObject())
             {
                 base.OnGazeInteraction();
             }
-            #endif
+#endif
         }
 
         /// <summary>
@@ -619,10 +611,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <remarks>Currently only called for HoloLens.</remarks>
         protected override void OnSelectInteraction()
         {
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             // On HoloLens, we just advance the demo.
             UnityDispatcher.InvokeOnAppThread(() => advanceDemoTask = AdvanceDemoAsync());
-            #endif
+#endif
 
             base.OnSelectInteraction();
         }
@@ -677,7 +669,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 await Task.Delay(330);
                 float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
                 feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
-               // scanImage.SetActive(true);
+                // scanImage.SetActive(true);
             }
 
             bool success = false;
@@ -755,7 +747,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 return SpawnNewAnchoredObject(worldPos, worldRot, 0);
             }
-                        
+
         }
 
         /// <summary>
@@ -821,7 +813,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <summary>
         /// Gets the prefab used to represent an anchored object.
         /// </summary>
-        public GameObject[] AnchoredObjectPrefab { get { return new GameObject[8] { anchoredObjectPrefab0, anchoredObjectPrefab1, anchoredObjectPrefab2, anchoredObjectPrefab3, anchoredObjectPrefab4, anchoredObjectPrefab5, anchoredObjectPrefab6, anchoredObjectPrefab7}; } }
+        public GameObject[] AnchoredObjectPrefab { get { return new GameObject[8] { anchoredObjectPrefab0, anchoredObjectPrefab1, anchoredObjectPrefab2, anchoredObjectPrefab3, anchoredObjectPrefab4, anchoredObjectPrefab5, anchoredObjectPrefab6, anchoredObjectPrefab7 }; } }
 
         /// <summary>
         /// Gets the <see cref="SpatialAnchorManager"/> instance used by this demo.

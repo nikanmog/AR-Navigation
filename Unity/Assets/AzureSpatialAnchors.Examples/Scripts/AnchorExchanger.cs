@@ -26,34 +26,43 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
+
+
         public void WatchKeys(string exchangerUrl)
         {
+
             baseAddress = exchangerUrl;
             Task.Factory.StartNew(async () =>
+            {
+                int anchorAmount = await RetrieveAnchorAmount();
+                while (true)
                 {
-                    while (true)
+                    for (int i = 1; 1 <= anchorAmount ; i++)
                     {
-                        for (int i = 1; 1<5; i++)
+                        string currentKey = await RetrieveAnchorKey(i);
+                        int currentType = await RetrieveAnchorType(i);
+                        if (!string.IsNullOrWhiteSpace(currentKey))
                         {
-                            string currentKey = await RetrieveAnchorKey(i);
-                            int currentType = await RetrieveAnchorType(i);
-                            if (!string.IsNullOrWhiteSpace(currentKey))
+                            Debug.Log("Found key " + currentKey);
+                            lock (anchorkeys)
                             {
-                                Debug.Log("Found key " + currentKey);
-                                lock (anchorkeys)
-                                {
-                                    anchorkeys.Add(currentKey, currentType);
-                                }
+                                anchorkeys.Add(currentKey, currentType);
                             }
-                            
                         }
+
                     }
-                }, TaskCreationOptions.LongRunning);
+                }
+            }, TaskCreationOptions.LongRunning);
         }
+
+
+
+
+        
         public int anchorType(string anchorKey)
         {
             int defaultType = 1;
-            
+
             if (anchorkeys.ContainsKey(anchorKey))
             {
                 return anchorkeys[anchorKey];
@@ -82,7 +91,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             try
             {
                 HttpClient client = new HttpClient();
-                return int.Parse(await client.GetStringAsync(baseAddress  +"/"+ anchorNumber.ToString() + "/type"));
+                return int.Parse(await client.GetStringAsync(baseAddress + "/" + anchorNumber.ToString() + "/type"));
 
             }
             catch (Exception ex)
@@ -94,6 +103,21 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
 
 
+        public async Task<int> RetrieveAnchorAmount()
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                return int.Parse(await client.GetStringAsync(baseAddress + "/count"));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                Debug.LogError("Failed to retrieve last anchor key.");
+                return 0;
+            }
+        }
 
         internal async Task<long> StoreAnchorKey(string anchorKey)
         {
