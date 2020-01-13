@@ -157,6 +157,14 @@ namespace SharingService.Data
         }
 
 
+        /// <summary>
+        /// Gets the last anchor key asynchronously.
+        /// </summary>
+        /// <returns>The anchor key.</returns>
+        public async Task<int> GetAnchorCountAsync()
+        {
+            return 0;// TBD
+        }
 
         /// <summary>
         /// Gets the last anchor key asynchronously.
