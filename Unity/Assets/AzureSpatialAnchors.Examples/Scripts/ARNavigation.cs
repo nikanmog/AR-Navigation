@@ -218,6 +218,41 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 });
             }
         }
+        protected async Task OnSaveCloudAnchorSuccessfulAsync()
+        {
+
+            Debug.Log("Anchor created, yay!");
+            anchors.Add(currentCloudAnchor.Identifier, 0);
+
+            await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
+
+            // Sanity check that the object is still where we expect
+            Pose anchorPose = Pose.identity;
+
+#if UNITY_ANDROID || UNITY_IOS
+            anchorPose = currentCloudAnchor.GetPose();
+#endif
+            // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+
+
+            SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
+
+            spawnedObject = null;
+            currentCloudAnchor = null;
+
+            if (allspawnedObjects.Count < numToMake)
+            {
+                feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
+                currentAppState = AppState.Placing;
+                CloudManager.StopSession();
+            }
+            else
+            {
+                feedbackBox.text = "Saved... ready to start finding them.";
+                CloudManager.StopSession();
+                currentAppState = AppState.ReadyToSearch;
+            }
+        }
         /// <summary>
         /// Saves the current object anchor to the cloud.
         /// </summary>
@@ -233,7 +268,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             CloudSpatialAnchor cloudAnchor = cna.CloudAnchor;
 
             // In this sample app we delete the cloud anchor explicitly, but here we show how to set an anchor to expire automatically
-            //cloudAnchor.Expiration = DateTimeOffset.Now.AddDays(7);
+            cloudAnchor.Expiration = DateTimeOffset.Now.AddDays(7);
 
             while (!CloudManager.IsReadyForCreate)
             {
@@ -262,38 +297,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 {
                     // Await override, which may perform additional tasks
                     // such as storing the key in the AnchorExchanger
-
-                    Debug.Log("Anchor created, yay!");
-                    anchors.Add(currentCloudAnchor.Identifier, 0);
-
-                    await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
-
-                    // Sanity check that the object is still where we expect
-                    Pose anchorPose = Pose.identity;
-
-#if UNITY_ANDROID || UNITY_IOS
-                    anchorPose = currentCloudAnchor.GetPose();
-#endif
-                    // HoloLens: The position will be set based on the unityARUserAnchor that was located.
-
-
-                    SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
-
-                    spawnedObject = null;
-                    currentCloudAnchor = null;
-
-                    if (allspawnedObjects.Count < numToMake)
-                    {
-                        feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
-                        currentAppState = AppState.Placing;
-                        CloudManager.StopSession();
-                    }
-                    else
-                    {
-                        feedbackBox.text = "Saved... ready to start finding them.";
-                        CloudManager.StopSession();
-                        currentAppState = AppState.ReadyToSearch;
-                    }
+                    await OnSaveCloudAnchorSuccessfulAsync();
                 }
                 else
                 {
@@ -327,6 +331,22 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         #region Object Handlers
         /// <summary>
+        /// Spawns a new anchored object.
+        /// </summary>
+        /// <param name="worldPos">The world position.</param>
+        /// <param name="worldRot">The world rotation.</param>
+        /// <returns><see cref="GameObject"/>.</returns>
+        protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot, int type)
+        {
+            // Create the prefab
+            GameObject newGameObject = GameObject.Instantiate(allPrefabs[type], worldPos, worldRot);
+            // Attach a cloud-native anchor behavior to help keep cloud
+            // and native anchors in sync.
+            newGameObject.AddComponent<CloudNativeAnchor>();
+            // Return created object
+            return newGameObject;
+        }
+        /// <summary>
         /// Spawns a new object.
         /// </summary>
         /// <param name="worldPos">The world position.</param>
@@ -335,21 +355,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <returns><see cref="GameObject"/>.</returns>
         protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot, CloudSpatialAnchor cloudSpatialAnchor)
         {
-            GameObject newGameObject = GameObject.Instantiate(allPrefabs[anchorExchanger.anchorType(cloudSpatialAnchor.Identifier)], worldPos, worldRot);
-            // Attach a cloud-native anchor behavior to help keep cloud
-            // and native anchors in sync.
-            newGameObject.AddComponent<CloudNativeAnchor>();
-
             // If a cloud anchor is passed, apply it to the native anchor
             if (cloudSpatialAnchor != null)
             {
+                GameObject newGameObject = SpawnNewAnchoredObject(worldPos, worldRot, anchorExchanger.anchorType(cloudSpatialAnchor.Identifier));
                 CloudNativeAnchor cloudNativeAnchor = newGameObject.GetComponent<CloudNativeAnchor>();
                 cloudNativeAnchor.CloudToNative(cloudSpatialAnchor);
                 return newGameObject;
             }
             else
             {
-                return newGameObject;
+                return SpawnNewAnchoredObject(worldPos, worldRot, 0);
             }
         }
         protected void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
@@ -360,6 +376,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 spawnedObject = allspawnedObjects[currentCloudAnchor.Identifier];
             }
             bool spawnedNewObject = spawnedObject == null;
+
             // Create the object if we need to, and attach the platform appropriate
             // Anchor behavior to the spawned object
             if (spawnedObject == null)
@@ -375,6 +392,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 // Use factory method to move
                 MoveAnchoredObject(spawnedObject, worldPos, worldRot, currentCloudAnchor);
             }
+
             if (spawnedNewObject)
             {
                 allSpawnedMaterials.Add(spawnedObjectMat);
