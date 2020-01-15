@@ -151,10 +151,49 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     */
             }
         }
+        public async Task AdvanceDemoAsync()
+        {
+            switch (currentAppState)
+            {
+                case AppState.Placing:
+                    printmsg = "adv1a";
+                    if (spawnedObject != null)
+                    {
+                        currentAppState = AppState.Saving;
+                        if (!CloudManager.IsSessionStarted)
+                        {
+                            await CloudManager.StartSessionAsync();
+                        }
+                        await SaveCurrentObjectAnchorToCloudAsync();
+                    }
+                    printmsg = "adv1b";
+                    break;
+                case AppState.ReadyToSearch:
+                    printmsg = "adv2a";
+                    await CloudManager.ResetSessionAsync();
+                    await CloudManager.StartSessionAsync();
+                    SetGraphEnabled(false);
+                    anchorLocateCriteria.Identifiers = new List<String>(anchors.Keys).ToArray();
+                    locatedCount = 0;
+                    currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
+                    currentAppState = AppState.Searching;
+                    printmsg = "adv2b";
+                    break;
+                case AppState.ReadyToNeighborQuery:
+                    printmsg = "adv3a";
+                    SetGraphEnabled(true);
+                    anchors = new Dictionary<string, int>();
+                    SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
+                    locatedCount = 0;
+                    currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
+                    currentAppState = AppState.Neighboring;
+                    printmsg = "adv3b";
+                    break;
 
+            }
+        }
         protected void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
         {
-
             if (args.Status == LocateAnchorStatus.Located)
             {
                 UnityDispatcher.InvokeOnAppThread(() =>
@@ -179,197 +218,93 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 });
             }
         }
-
-        protected void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
-        {
-
-            if (currentCloudAnchor != null && allspawnedObjects.ContainsKey(currentCloudAnchor.Identifier))
-            {
-                spawnedObject = allspawnedObjects[currentCloudAnchor.Identifier];
-            }
-            bool spawnedNewObject = spawnedObject == null;
-            SpawnOrMoveCurrentAnchoredObjectX(worldPos, worldRot);
-
-
-
-            if (spawnedNewObject)
-            {
-                allSpawnedMaterials.Add(spawnedObjectMat);
-
-                if (currentCloudAnchor != null && allspawnedObjects.ContainsKey(currentCloudAnchor.Identifier) == false)
-                {
-                    allspawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
-                }
-            }
-
-        #if WINDOWS_UWP || UNITY_WSA
-            if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
-            {
-                spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
-            }
-        #endif
-        }
-
         /// <summary>
-        /// This version only exists for Unity to wire up a button click to.
-        /// If calling from code, please use the Async version above.
+        /// Saves the current object anchor to the cloud.
         /// </summary>
-        public async void AdvanceDemo()
+        protected virtual async Task SaveCurrentObjectAnchorToCloudAsync()
         {
+            // Get the cloud-native anchor behavior
+            CloudNativeAnchor cna = spawnedObject.GetComponent<CloudNativeAnchor>();
+
+            // If the cloud portion of the anchor hasn't been created yet, create it
+            if (cna.CloudAnchor == null) { cna.NativeToCloud(); }
+
+            // Get the cloud portion of the anchor
+            CloudSpatialAnchor cloudAnchor = cna.CloudAnchor;
+
+            // In this sample app we delete the cloud anchor explicitly, but here we show how to set an anchor to expire automatically
+            //cloudAnchor.Expiration = DateTimeOffset.Now.AddDays(7);
+
+            while (!CloudManager.IsReadyForCreate)
+            {
+                await Task.Delay(330);
+                float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
+                feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
+                // scanImage.SetActive(true);
+            }
+
+            bool success = false;
+            //scanImage.SetActive(false);
+            feedbackBox.text = "Saving...";
+
             try
             {
-                await AdvanceDemoAsync();
+                // Actually save
+                await CloudManager.CreateAnchorAsync(cloudAnchor);
+
+                // Store
+                currentCloudAnchor = cloudAnchor;
+
+                // Success?
+                success = currentCloudAnchor != null;
+
+                if (success && !isErrorActive)
+                {
+                    // Await override, which may perform additional tasks
+                    // such as storing the key in the AnchorExchanger
+
+                    Debug.Log("Anchor created, yay!");
+                    anchors.Add(currentCloudAnchor.Identifier, 0);
+
+                    await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
+
+                    // Sanity check that the object is still where we expect
+                    Pose anchorPose = Pose.identity;
+
+#if UNITY_ANDROID || UNITY_IOS
+                    anchorPose = currentCloudAnchor.GetPose();
+#endif
+                    // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+
+
+                    SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
+
+                    spawnedObject = null;
+                    currentCloudAnchor = null;
+
+                    if (allspawnedObjects.Count < numToMake)
+                    {
+                        feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
+                        currentAppState = AppState.Placing;
+                        CloudManager.StopSession();
+                    }
+                    else
+                    {
+                        feedbackBox.text = "Saved... ready to start finding them.";
+                        CloudManager.StopSession();
+                        currentAppState = AppState.ReadyToSearch;
+                    }
+                }
+                else
+                {
+                    OnSaveCloudAnchorFailedB(new Exception("Failed to save, but no exception was thrown."));
+                }
             }
             catch (Exception ex)
             {
-                Debug.LogError($"{nameof(DemoScriptBase)} - Error in {nameof(AdvanceDemo)}: {ex.Message} {ex.StackTrace}");
-                feedbackBox.text = $"Demo failed, check debugger output for more information";
+                OnSaveCloudAnchorFailedB(ex);
             }
         }
-
-        public async Task AdvanceDemoAsync()
-        {
-            switch (currentAppState)
-            {
-                case AppState.Placing:
-                    printmsg = "adv1a";
-                    if (spawnedObject != null)
-                    {
-                        currentAppState = AppState.Saving;
-                        if (!CloudManager.IsSessionStarted)
-                        {
-                            await CloudManager.StartSessionAsync();
-                        }
-                        await SaveCurrentObjectAnchorToCloudAsync();
-                    }
-                    printmsg = "adv1b";
-                    break;
-                case AppState.ReadyToSearch:
-                    printmsg = "adv2a";
-                    if (!CloudManager.IsSessionStarted)
-                    {
-                        await CloudManager.StartSessionAsync();
-                    }
-                    await CloudManager.ResetSessionAsync();
-                    await CloudManager.StartSessionAsync();
-                    SetGraphEnabled(false);
-                    anchorLocateCriteria.Identifiers = new List<String>(anchors.Keys).ToArray();
-                    locatedCount = 0;
-                    currentWatcher = CreateWatcher();
-                    currentAppState = AppState.Searching;
-                    printmsg = "adv2b";
-                    break;
-                case AppState.ReadyToNeighborQuery:
-                    printmsg = "adv3a";
-                    SetGraphEnabled(true);
-                    anchors = new Dictionary<string, int>();
-                    SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
-                    locatedCount = 0;
-                    currentWatcher = CreateWatcher();
-                    currentAppState = AppState.Neighboring;
-                    printmsg = "adv3b";
-                    break;
-
-            }
-        }
-
-        protected async Task OnSaveCloudAnchorSuccessfulAsync()
-        {
-
-            Debug.Log("Anchor created, yay!");
-            anchors.Add(currentCloudAnchor.Identifier, 0);
-
-            await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
-
-            // Sanity check that the object is still where we expect
-            Pose anchorPose = Pose.identity;
-
-#if UNITY_ANDROID || UNITY_IOS
-            anchorPose = currentCloudAnchor.GetPose();
-#endif
-            // HoloLens: The position will be set based on the unityARUserAnchor that was located.
-
-
-            SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
-
-            spawnedObject = null;
-            currentCloudAnchor = null;
-
-            if (allspawnedObjects.Count < numToMake)
-            {
-                feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
-                currentAppState = AppState.Placing;
-                CloudManager.StopSession();
-            }
-            else
-            {
-                feedbackBox.text = "Saved... ready to start finding them.";
-                CloudManager.StopSession();
-                currentAppState = AppState.ReadyToSearch;
-            }
-        }
-
-        protected bool IsPlacingObject()
-        {
-            return currentAppState == AppState.Placing;
-        }
-
-
-        /// <summary>
-        /// Destroying the attached Behaviour will result in the game or Scene
-        /// receiving OnDestroy.
-        /// </summary>
-        /// <remarks>OnDestroy will only be called on game objects that have previously been active.</remarks>
-        public override void OnDestroy()
-        {
-            if (CloudManager != null)
-            {
-                CloudManager.StopSession();
-            }
-
-            if (currentWatcher != null)
-            {
-                currentWatcher.Stop();
-                currentWatcher = null;
-            }
-
-            CleanupSpawnedObjects();
-
-            // Pass to base for final cleanup
-            base.OnDestroy();
-        }
-
-        /// <summary>
-        /// Cleans up spawned objects.
-        /// </summary>
-        protected virtual void CleanupSpawnedObjects()
-        {
-            if (spawnedObject != null)
-            {
-                Destroy(spawnedObject);
-                spawnedObject = null;
-            }
-
-            if (spawnedObjectMat != null)
-            {
-                Destroy(spawnedObjectMat);
-                spawnedObjectMat = null;
-            }
-        }
-
-        protected CloudSpatialAnchorWatcher CreateWatcher()
-        {
-            if ((CloudManager != null) && (CloudManager.Session != null))
-            {
-                return CloudManager.Session.CreateWatcher(anchorLocateCriteria);
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-
         protected void SetNearbyAnchor(CloudSpatialAnchor nearbyAnchor, float DistanceInMeters, int MaxNearAnchorsToFind)
         {
             if (nearbyAnchor == null)
@@ -384,33 +319,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             nac.MaxResultCount = MaxNearAnchorsToFind;
             anchorLocateCriteria.NearAnchor = nac;
         }
-
         protected void SetGraphEnabled(bool UseGraph, bool JustGraph = false)
         {
             anchorLocateCriteria.Strategy = UseGraph ?
                                             (JustGraph ? LocateStrategy.Relationship : LocateStrategy.AnyStrategy) :
                                             LocateStrategy.VisualInformation;
         }
-        /// <summary>
-        /// Spawns a new anchored object.
-        /// </summary>
-        /// <param name="worldPos">The world position.</param>
-        /// <param name="worldRot">The world rotation.</param>
-        /// <returns><see cref="GameObject"/>.</returns>
-        protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot, int type)
-        {
-            // Create the prefab
-
-            GameObject newGameObject = GameObject.Instantiate(allPrefabs[type], worldPos, worldRot);
-
-            // Attach a cloud-native anchor behavior to help keep cloud
-            // and native anchors in sync.
-            newGameObject.AddComponent<CloudNativeAnchor>();
-
-
-            // Return created object
-            return newGameObject;
-        }
+        #region Object Handlers
         /// <summary>
         /// Spawns a new object.
         /// </summary>
@@ -420,29 +335,31 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <returns><see cref="GameObject"/>.</returns>
         protected virtual GameObject SpawnNewAnchoredObject(Vector3 worldPos, Quaternion worldRot, CloudSpatialAnchor cloudSpatialAnchor)
         {
+            GameObject newGameObject = GameObject.Instantiate(allPrefabs[anchorExchanger.anchorType(cloudSpatialAnchor.Identifier)], worldPos, worldRot);
+            // Attach a cloud-native anchor behavior to help keep cloud
+            // and native anchors in sync.
+            newGameObject.AddComponent<CloudNativeAnchor>();
 
             // If a cloud anchor is passed, apply it to the native anchor
             if (cloudSpatialAnchor != null)
             {
-                GameObject newGameObject = SpawnNewAnchoredObject(worldPos, worldRot, anchorExchanger.anchorType(cloudSpatialAnchor.Identifier));
                 CloudNativeAnchor cloudNativeAnchor = newGameObject.GetComponent<CloudNativeAnchor>();
                 cloudNativeAnchor.CloudToNative(cloudSpatialAnchor);
                 return newGameObject;
             }
             else
             {
-                return SpawnNewAnchoredObject(worldPos, worldRot, 0);
+                return newGameObject;
             }
-
         }
-        /// <summary>
-        /// Spawns a new anchored object and makes it the current object or moves the
-        /// current anchored object if one exists.
-        /// </summary>
-        /// <param name="worldPos">The world position.</param>
-        /// <param name="worldRot">The world rotation.</param>
-        protected virtual void SpawnOrMoveCurrentAnchoredObjectX(Vector3 worldPos, Quaternion worldRot)
+        protected void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
         {
+
+            if (currentCloudAnchor != null && allspawnedObjects.ContainsKey(currentCloudAnchor.Identifier))
+            {
+                spawnedObject = allspawnedObjects[currentCloudAnchor.Identifier];
+            }
+            bool spawnedNewObject = spawnedObject == null;
             // Create the object if we need to, and attach the platform appropriate
             // Anchor behavior to the spawned object
             if (spawnedObject == null)
@@ -458,8 +375,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 // Use factory method to move
                 MoveAnchoredObject(spawnedObject, worldPos, worldRot, currentCloudAnchor);
             }
-        }
+            if (spawnedNewObject)
+            {
+                allSpawnedMaterials.Add(spawnedObjectMat);
 
+                if (currentCloudAnchor != null && allspawnedObjects.ContainsKey(currentCloudAnchor.Identifier) == false)
+                {
+                    allspawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
+                }
+            }
+
+#if WINDOWS_UWP || UNITY_WSA
+            if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
+            {
+                spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
+            }
+#endif
+        }
         /// <summary>
         /// Moves the specified anchored object.
         /// </summary>
@@ -491,62 +423,65 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 cna.SetPose(worldPos, worldRot);
             }
         }
+        #endregion Object Handlers
+        #region Unity Handlers
         /// <summary>
-        /// Saves the current object anchor to the cloud.
+        /// This version only exists for Unity to wire up a button click to.
+        /// If calling from code, please use the Async version above.
         /// </summary>
-        protected virtual async Task SaveCurrentObjectAnchorToCloudAsync()
+        public async void AdvanceDemo()
         {
-            // Get the cloud-native anchor behavior
-            CloudNativeAnchor cna = spawnedObject.GetComponent<CloudNativeAnchor>();
-
-            // If the cloud portion of the anchor hasn't been created yet, create it
-            if (cna.CloudAnchor == null) { cna.NativeToCloud(); }
-
-            // Get the cloud portion of the anchor
-            CloudSpatialAnchor cloudAnchor = cna.CloudAnchor;
-
-            // In this sample app we delete the cloud anchor explicitly, but here we show how to set an anchor to expire automatically
-            cloudAnchor.Expiration = DateTimeOffset.Now.AddDays(7);
-
-            while (!CloudManager.IsReadyForCreate)
-            {
-                await Task.Delay(330);
-                float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
-                feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
-                // scanImage.SetActive(true);
-            }
-
-            bool success = false;
-            //scanImage.SetActive(false);
-            feedbackBox.text = "Saving...";
-
             try
             {
-                // Actually save
-                await CloudManager.CreateAnchorAsync(cloudAnchor);
-
-                // Store
-                currentCloudAnchor = cloudAnchor;
-
-                // Success?
-                success = currentCloudAnchor != null;
-
-                if (success && !isErrorActive)
-                {
-                    // Await override, which may perform additional tasks
-                    // such as storing the key in the AnchorExchanger
-                    await OnSaveCloudAnchorSuccessfulAsync();
-                }
-                else
-                {
-                    OnSaveCloudAnchorFailedB(new Exception("Failed to save, but no exception was thrown."));
-                }
+                await AdvanceDemoAsync();
             }
             catch (Exception ex)
             {
-                OnSaveCloudAnchorFailedB(ex);
+                Debug.LogError($"{nameof(DemoScriptBase)} - Error in {nameof(AdvanceDemo)}: {ex.Message} {ex.StackTrace}");
+                feedbackBox.text = $"Demo failed, check debugger output for more information";
             }
         }
+        /// <summary>
+        /// Destroying the attached Behaviour will result in the game or Scene
+        /// receiving OnDestroy.
+        /// </summary>
+        /// <remarks>OnDestroy will only be called on game objects that have previously been active.</remarks>
+        public override void OnDestroy()
+        {
+            if (CloudManager != null)
+            {
+                CloudManager.StopSession();
+            }
+
+            if (currentWatcher != null)
+            {
+                currentWatcher.Stop();
+                currentWatcher = null;
+            }
+
+            CleanupSpawnedObjects();
+
+            // Pass to base for final cleanup
+            base.OnDestroy();
+        }
+        /// <summary>
+        /// Cleans up spawned objects.
+        /// </summary>
+        protected virtual void CleanupSpawnedObjects()
+        {
+            if (spawnedObject != null)
+            {
+                Destroy(spawnedObject);
+                spawnedObject = null;
+            }
+
+            if (spawnedObjectMat != null)
+            {
+                Destroy(spawnedObjectMat);
+                spawnedObjectMat = null;
+            }
+        }
+        #endregion Unity Handlers
         #region Interaction Handlers
         /// <summary>
         /// Called when gaze interaction occurs.
@@ -569,7 +504,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected override void OnGazeObjectInteraction(Vector3 hitPoint, Vector3 hitNormal)
         {
             base.OnGazeObjectInteraction(hitPoint, hitNormal);
-            if (IsPlacingObject())
+            if (currentAppState == AppState.Placing)
             {
         #if WINDOWS_UWP || UNITY_WSA
                 Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
@@ -609,7 +544,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <param name="target">The target.</param>
         protected override void OnSelectObjectInteraction(Vector3 hitPoint, object target)
         {
-            if (IsPlacingObject())
+            if (currentAppState == AppState.Placing)
             {
                 Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
                 Quaternion rotation = Quaternion.LookRotation(direction);
@@ -622,13 +557,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <param name="touch">The touch.</param>
         protected override void OnTouchInteraction(Touch touch)
         {
-            if (IsPlacingObject())
+            if (currentAppState == AppState.Placing)
             {
                 base.OnTouchInteraction(touch);
             }
         }
         #endregion Interaction Handlers
-        #region Cloud Manager Event Handlers
+        #region Cloud Manager Default Handlers
         /// <summary>
         /// Called when cloud anchor location has completed.
         /// </summary>
@@ -666,6 +601,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             Debug.Log(args.Message);
         }
-        #endregion Cloud Manager Event Handlers
+        #endregion Cloud Manager Default Handlers
     }
 }
