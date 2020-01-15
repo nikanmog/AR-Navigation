@@ -172,7 +172,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     printmsg = "adv2a";
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
-                    SetGraphEnabled(false);
+                    SetGraphEnabled(true);
                     anchorLocateCriteria.Identifiers = new List<String>(anchors.Keys).ToArray();
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
@@ -453,9 +453,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 await AdvanceDemoAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.LogError($"{nameof(DemoScriptBase)} - Error in {nameof(AdvanceDemo)}: {ex.Message} {ex.StackTrace}");
                 feedbackBox.text = $"Demo failed, check debugger output for more information";
             }
         }
