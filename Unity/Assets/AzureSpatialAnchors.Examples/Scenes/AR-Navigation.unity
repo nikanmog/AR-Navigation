@@ -343,8 +343,7 @@ MonoBehaviour:
   anchoredObjectPrefab5: {fileID: 0}
   anchoredObjectPrefab6: {fileID: 0}
   anchoredObjectPrefab7: {fileID: 0}
-  cloudManager: {fileID: 294771744}
-  BaseSharingUrl: 
+  CloudManager: {fileID: 294771744}
 --- !u!4 &294771743
 Transform:
   m_ObjectHideFlags: 0

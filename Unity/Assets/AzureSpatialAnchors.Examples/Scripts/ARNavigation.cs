@@ -75,8 +75,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private Material spawnedObjectMat = null;
         private Text feedbackBox;
 
-        private readonly List<string> anchorIdsToLocate = new List<string>();
-        private List<string> anchorIds = new List<string>();
+        private Dictionary<string, int> anchors = new Dictionary<string, int>();
         private Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
@@ -95,8 +94,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
             }
             anchorExchanger.GetAnchors(BaseSharingUrl);
-            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
-
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             CloudManager.SessionUpdated += CloudManager_SessionUpdated;
             CloudManager.AnchorLocated += CloudManager_AnchorLocated;
@@ -111,19 +108,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Update()
         {
-
-            feedbackBox.text = $"Mode: {currentAppState}, AnchorIDs Count: {anchorIds.Count}, locatedCount: {locatedCount}, print: {printmsg}";
-            anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
-
+            feedbackBox.text = $"Mode: {currentAppState}, AnchorIDs Count: {anchors.Count}, locatedCount: {locatedCount}, print: {printmsg}";
             base.Update();
             switch (currentAppState)
             {
+
                 case AppState.Initializing:
+                    anchors = anchorExchanger.anchorkeys;
                     if (anchorExchanger.anchorAmount == 0)
                     {
                         currentAppState = AppState.Placing;
                     }
-                    if (anchorIds.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
+                    if (anchors.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
                     {
                         currentAppState = AppState.ReadyToSearch;
                     }
@@ -257,8 +253,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
                     SetGraphEnabled(false);
-                    IEnumerable<string> anchorsToFind = anchorIds;
-                    SetAnchorIdsToLocate(anchorsToFind);
+                    anchorLocateCriteria.Identifiers = new List<String>(anchors.Keys).ToArray();
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
                     currentAppState = AppState.Searching;
@@ -267,7 +262,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 case AppState.ReadyToNeighborQuery:
                     printmsg = "adv3a";
                     SetGraphEnabled(true);
-                    ResetAnchorIdsToLocate();
+                    anchors = new Dictionary<string, int>();
                     SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
                     locatedCount = 0;
                     currentWatcher = CreateWatcher();
@@ -282,8 +277,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
 
             Debug.Log("Anchor created, yay!");
-
-            anchorIds.Add(currentCloudAnchor.Identifier);
+            anchors.Add(currentCloudAnchor.Identifier, 0);
 
             await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
 
@@ -319,10 +313,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             return currentAppState == AppState.Placing;
         }
-        protected void OnSaveCloudAnchorFailed(Exception exception)
-        {
-            OnSaveCloudAnchorFailed(exception);
-        }
+
 
         /// <summary>
         /// Destroying the attached Behaviour will result in the game or Scene
@@ -378,23 +369,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
-        protected void SetAnchorIdsToLocate(IEnumerable<string> anchorIds)
-        {
-            if (anchorIds == null)
-            {
-                throw new ArgumentNullException(nameof(anchorIds));
-            }
-
-            anchorIdsToLocate.Clear();
-            anchorIdsToLocate.AddRange(anchorIds);
-            anchorLocateCriteria.Identifiers = anchorIdsToLocate.ToArray();
-        }
-
-        protected void ResetAnchorIdsToLocate()
-        {
-            anchorIdsToLocate.Clear();
-            anchorLocateCriteria.Identifiers = new string[0];
-        }
 
         protected void SetNearbyAnchor(CloudSpatialAnchor nearbyAnchor, float DistanceInMeters, int MaxNearAnchorsToFind)
         {
@@ -662,6 +636,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected virtual void OnCloudLocateAnchorsCompleted(LocateAnchorsCompletedEventArgs args)
         {
             Debug.Log("Locate pass complete");
+        }
+        protected void OnSaveCloudAnchorFailed(Exception exception)
+        {
+            OnSaveCloudAnchorFailed(exception);
         }
         private void CloudManager_AnchorLocated(object sender, AnchorLocatedEventArgs args)
         {
