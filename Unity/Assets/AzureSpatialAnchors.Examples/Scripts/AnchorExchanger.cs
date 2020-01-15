@@ -10,28 +10,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class AnchorExchanger
     {
-
         private string baseAddress = "";
-
         public Dictionary<string, int> anchorkeys = new Dictionary<string, int>();
 
-        public Dictionary<string, int> AnchorKeys
-        {
-            get
-            {
-                lock (anchorkeys)
-                {
-                    return new Dictionary<string, int>(anchorkeys);
-                }
-            }
-        }
-
         public int anchorAmount = -1;
-
-        public void GetAnchors(string exchangerUrl, ARNavigation arnavigation)
+        public void GetAnchors(string exchangerUrl)
         {
-
-
             baseAddress = exchangerUrl;
             Task.Factory.StartNew(async () =>
             {
@@ -51,8 +35,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }, TaskCreationOptions.LongRunning);
         }
-
-        
         public int anchorType(string anchorKey)
         {
             int defaultType = 1;
@@ -63,7 +45,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             return defaultType;
         }
-
         public async Task<string> RetrieveAnchorKey(long anchorNumber)
         {
             try
@@ -78,8 +59,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return null;
             }
         }
-
-
         public async Task<int> RetrieveAnchorType(long anchorNumber)
         {
             try
@@ -95,8 +74,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return 0;
             }
         }
-
-
         public async Task<int> RetrieveAnchorAmount()
         {
             try
@@ -112,7 +89,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return 0;
             }
         }
-
         internal async Task<long> StoreAnchorKey(string anchorKey)
         {
             if (string.IsNullOrWhiteSpace(anchorKey))
@@ -153,6 +129,5 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return -1;
             }
         }
-
     }
 }

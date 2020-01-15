@@ -34,7 +34,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
         private GameObject anchoredObjectPrefab7 = null;
-        public GameObject[] AnchoredObjectPrefab
+        private GameObject[] allPrefabs
         {
             get
             {
@@ -45,28 +45,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         [SerializeField]
         [Tooltip("SpatialAnchorManager instance to use for this demo. This is required.")]
-        public SpatialAnchorManager CloudManager = null;
+        private SpatialAnchorManager CloudManager = null;
         #endregion
         #region Helper Variables
-
-        #endregion Helper Variables
-
-        #region Class References
-        public AnchorExchanger anchorExchanger = new AnchorExchanger();
-        #endregion Class References
-
-        protected bool isErrorActive = false;
-        protected Text feedbackBox;
-
-        protected AnchorLocateCriteria anchorLocateCriteria = null;
-        protected CloudSpatialAnchor currentCloudAnchor;
-        protected CloudSpatialAnchorWatcher currentWatcher;
-
-        protected GameObject spawnedObject = null;
-        protected Material spawnedObjectMat = null;
-
-
-        public enum AppState
+        private enum AppState
         {
             Placing = 0,
             Saving,
@@ -76,25 +58,28 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             ReadyToNeighborQuery,
             Neighboring,
         }
-        public AppState currentAppState = AppState.Initializing;
-
+        private AppState currentAppState = AppState.Initializing;
+        private bool isErrorActive = false;
         private string printmsg = "";
-
         private readonly int numToMake = 7;
         private int locatedCount = 0;
+        #endregion Helper Variables
+        #region Class References
+        private AnchorExchanger anchorExchanger = new AnchorExchanger();
+        private AnchorLocateCriteria anchorLocateCriteria = null;
+        private CloudSpatialAnchor currentCloudAnchor;
+        private CloudSpatialAnchorWatcher currentWatcher;
+        #endregion Class References
+        #region Game Objects
+        private GameObject spawnedObject = null;
+        private Material spawnedObjectMat = null;
+        private Text feedbackBox;
 
-
-
-        protected readonly List<string> anchorIdsToLocate = new List<string>();
-        List<string> anchorIds = new List<string>();
-        private Dictionary<string, GameObject> spawnedObjects = new Dictionary<string, GameObject>();
+        private readonly List<string> anchorIdsToLocate = new List<string>();
+        private List<string> anchorIds = new List<string>();
+        private Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
-
-
-
-
-
-
+        #endregion Game Objects
 
         /// <summary>
         /// Start is called on the frame when a script is enabled just before any
@@ -109,7 +94,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
             }
-            anchorExchanger.GetAnchors(BaseSharingUrl, this);
+            anchorExchanger.GetAnchors(BaseSharingUrl);
             anchorIds = new List<string>(this.anchorExchanger.anchorkeys.Keys);
 
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
@@ -202,9 +187,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected void SpawnOrMoveCurrentAnchoredObject(Vector3 worldPos, Quaternion worldRot)
         {
 
-            if (currentCloudAnchor != null && spawnedObjects.ContainsKey(currentCloudAnchor.Identifier))
+            if (currentCloudAnchor != null && allspawnedObjects.ContainsKey(currentCloudAnchor.Identifier))
             {
-                spawnedObject = spawnedObjects[currentCloudAnchor.Identifier];
+                spawnedObject = allspawnedObjects[currentCloudAnchor.Identifier];
             }
             bool spawnedNewObject = spawnedObject == null;
             SpawnOrMoveCurrentAnchoredObjectX(worldPos, worldRot);
@@ -215,9 +200,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 allSpawnedMaterials.Add(spawnedObjectMat);
 
-                if (currentCloudAnchor != null && spawnedObjects.ContainsKey(currentCloudAnchor.Identifier) == false)
+                if (currentCloudAnchor != null && allspawnedObjects.ContainsKey(currentCloudAnchor.Identifier) == false)
                 {
-                    spawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
+                    allspawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
                 }
             }
 
@@ -316,9 +301,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             spawnedObject = null;
             currentCloudAnchor = null;
 
-            if (spawnedObjects.Count < numToMake)
+            if (allspawnedObjects.Count < numToMake)
             {
-                feedbackBox.text = $"Saved...Make another {spawnedObjects.Count}/{numToMake} ";
+                feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
                 currentAppState = AppState.Placing;
                 CloudManager.StopSession();
             }
@@ -442,7 +427,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             // Create the prefab
 
-            GameObject newGameObject = GameObject.Instantiate(AnchoredObjectPrefab[type], worldPos, worldRot);
+            GameObject newGameObject = GameObject.Instantiate(allPrefabs[type], worldPos, worldRot);
 
             // Attach a cloud-native anchor behavior to help keep cloud
             // and native anchors in sync.
