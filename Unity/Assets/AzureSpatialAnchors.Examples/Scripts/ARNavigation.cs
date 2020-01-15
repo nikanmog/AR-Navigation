@@ -125,30 +125,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     }
                     break;
                 case AppState.Neighboring:
-                    //  scanImage.SetActive(false);
-                    // We should find all anchors except for the anchor we are using as the source anchor.
                     feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
-
                     if (locatedCount == numToMake - 1)
                     {
                         feedbackBox.text = "";
                     }
                     break;
-
-                    /*case AppState.Searching:
-       // scanImage.SetActive(true);
-        feedbackBox.text = "Please go to the starting point and look around.";
-        //scanImage.SetActive(true);
-        break;
-    case AppState.Initializing:
-       // scanImage.SetActive(false);
-        feedbackBox.text = "Initializing...";
-        break;
-    case AppState.ReadyToNeighborQuery:
-        //scanImage.SetActive(false);
-        feedbackBox.text = "Tap to continue";
-        break;
-    */
             }
         }
         public async Task AdvanceDemoAsync()
