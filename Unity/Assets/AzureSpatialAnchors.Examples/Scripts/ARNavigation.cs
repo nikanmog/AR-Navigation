@@ -63,7 +63,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         private AppState currentAppState = AppState.Initializing;
         private bool isErrorActive = false;
-        private string printmsg = "";
+        public string printmsg = "";
         private readonly int numToMake = 7;
         private int locatedCount = 0;
         #endregion Helper Variables
@@ -145,7 +145,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             switch (currentAppState)
             {
                 case AppState.Placing:
-                    printmsg = "adv1a";
                     if (spawnedObject != null)
                     {
                         currentAppState = AppState.Saving;
@@ -155,10 +154,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                         }
                         await SaveCurrentObjectAnchorToCloudAsync();
                     }
-                    printmsg = "adv1b";
                     break;
                 case AppState.ReadyToSearch:
-                    printmsg = "adv2a";
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
                     SetGraphEnabled(true);
@@ -166,17 +163,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Searching;
-                    printmsg = "adv2b";
                     break;
                 case AppState.ReadyToNeighborQuery:
-                    printmsg = "adv3a";
                     SetGraphEnabled(true);
                     anchorTypes = new Dictionary<string, int>();
                     SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Neighboring;
-                    printmsg = "adv3b";
                     break;
 
             }

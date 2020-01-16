@@ -6,6 +6,8 @@ public class NavigationGuide : MonoBehaviour
     #region Object Members
     private ARNavigation arnavigation;
     private GameObject guide = null;
+    private int originId = 1;
+    private int destinationId = 2;
     #endregion Object Members
     #region Control Functions
     public NavigationGuide(ARNavigation arNavigation)
@@ -35,15 +37,16 @@ public class NavigationGuide : MonoBehaviour
     #endregion Control Functions
 
     private GameObject origin() {
-        return arnavigation.allspawnedObjects[arnavigation.anchorOrder[1]]; //TODO change number
+        return arnavigation.allspawnedObjects[arnavigation.anchorOrder[originId]];
         
     }
     private GameObject destination()
     {
-        return arnavigation.allspawnedObjects[arnavigation.anchorOrder[2]]; //TODO change number
+        return arnavigation.allspawnedObjects[arnavigation.anchorOrder[destinationId]];
     }
     private Vector3 guidePosition()
     {
+
         float multiplicator = 0.0f;
         float newDistance = 999999.0f;
         float previousDistance = 99999999.0f;
@@ -53,7 +56,21 @@ public class NavigationGuide : MonoBehaviour
             newDistance = Vector3.Distance(path() * multiplicator, Camera.main.transform.position);
             multiplicator += 0.01f;
         }
+        multiplicator *= 1.2f;
+        if (multiplicator >= 1)
+        {
+            moveToNextObject();
+        }
+        arnavigation.printmsg = "MP:" + multiplicator + " OR:" + originId + "DS" + destinationId;
         return origin().transform.position + path() * multiplicator;
+    }
+    private void moveToNextObject()
+    {
+        if(destinationId < arnavigation.anchorOrder.Count)
+        {
+            originId += 1;
+            destinationId += 1;
+        }
     }
     private Quaternion guideDirection()
     {
