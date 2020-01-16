@@ -11,6 +11,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     {
         #region Unity Inspector Variables
         [SerializeField]
+        [Tooltip("Guide")]
+        public GameObject guidePrefab = null;
+        [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
         private GameObject anchoredObjectPrefab0 = null;
         [SerializeField]
@@ -69,14 +72,15 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private AnchorLocateCriteria anchorLocateCriteria = null;
         private CloudSpatialAnchor currentCloudAnchor;
         private CloudSpatialAnchorWatcher currentWatcher;
+        private NavigationGuide guide;
         #endregion Class References
         #region Game Objects
         private GameObject spawnedObject = null;
         private Material spawnedObjectMat = null;
         private Text feedbackBox;
-
-        private Dictionary<string, int> anchors = new Dictionary<string, int>();
-        private Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
+        public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
+        private Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
+        public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
 
@@ -86,7 +90,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Start()
         {
-
+            guide = new NavigationGuide(this);
             string BaseSharingUrl = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
             Uri result;
             if (Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
@@ -102,24 +106,26 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             CloudManager.Error += CloudManager_Error;
             anchorLocateCriteria = new AnchorLocateCriteria();
             base.Start();
+            
         }
         /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         public override void Update()
         {
-            feedbackBox.text = $"Mode: {currentAppState}, AnchorIDs Count: {anchors.Count}, locatedCount: {locatedCount}, print: {printmsg}";
+            guide.Update();
+            feedbackBox.text = $"Mode: {currentAppState}, AnchorIDs Count: {anchorTypes.Count}, locatedCount: {locatedCount}, print: {printmsg}";
             base.Update();
             switch (currentAppState)
             {
-
                 case AppState.Initializing:
-                    anchors = anchorExchanger.anchorkeys;
+                    anchorTypes = anchorExchanger.anchorTypes;
+                    anchorOrder = anchorExchanger.anchorOrder;
                     if (anchorExchanger.anchorAmount == 0)
                     {
                         currentAppState = AppState.Placing;
                     }
-                    if (anchors.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
+                    if (anchorTypes.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
                     {
                         currentAppState = AppState.ReadyToSearch;
                     }
@@ -132,6 +138,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     }
                     break;
             }
+
         }
         public async Task AdvanceDemoAsync()
         {
@@ -155,7 +162,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
                     SetGraphEnabled(true);
-                    anchorLocateCriteria.Identifiers = new List<String>(anchors.Keys).ToArray();
+                    anchorLocateCriteria.Identifiers = new List<String>(anchorTypes.Keys).ToArray();
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Searching;
@@ -164,7 +171,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 case AppState.ReadyToNeighborQuery:
                     printmsg = "adv3a";
                     SetGraphEnabled(true);
-                    anchors = new Dictionary<string, int>();
+                    anchorTypes = new Dictionary<string, int>();
                     SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
@@ -204,7 +211,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
 
             Debug.Log("Anchor created, yay!");
-            anchors.Add(currentCloudAnchor.Identifier, 0);
+            anchorTypes.Add(currentCloudAnchor.Identifier, 0);
 
             await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
 
@@ -388,7 +395,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 #if WINDOWS_UWP || UNITY_WSA
             if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
             {
-                spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
+                allspawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
             }
 #endif
         }

@@ -11,8 +11,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     public class AnchorExchanger
     {
         private string baseAddress = "";
-        public Dictionary<string, int> anchorkeys = new Dictionary<string, int>();
-
+        public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
+        public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
         public void GetAnchors(string exchangerUrl)
         {
@@ -27,10 +27,15 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     if (!string.IsNullOrWhiteSpace(currentKey))
                     {
                         Debug.Log("Found key " + currentKey);
-                        lock (anchorkeys)
+                        lock (anchorTypes)
                         {
-                            anchorkeys.Add(currentKey, currentType);
+                            anchorTypes.Add(currentKey, currentType);
                         }
+                        lock (anchorOrder)
+                        {
+                            anchorOrder.Add(i, currentKey);
+                        }
+                        
                     }
                 }
             }, TaskCreationOptions.LongRunning);
@@ -39,9 +44,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             int defaultType = 1;
 
-            if (anchorkeys.ContainsKey(anchorKey))
+            if (anchorTypes.ContainsKey(anchorKey))
             {
-                return anchorkeys[anchorKey];
+                return anchorTypes[anchorKey];
             }
             return defaultType;
         }
