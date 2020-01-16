@@ -1,66 +1,56 @@
 ﻿using Microsoft.Azure.SpatialAnchors.Unity.Examples;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class NavigationGuide : MonoBehaviour
 {
+    #region Object Members
     private ARNavigation arnavigation;
     private GameObject guide = null;
+    #endregion Object Members
+    #region Control Functions
     public NavigationGuide(ARNavigation arNavigation)
     {
         this.arnavigation = arNavigation;
-        this.Start();
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-        //guide.transform.position.x;
-    }
-
-    // Update is called once per frame
     public void Update()
     {
         if(arnavigation.allspawnedObjects.Count >= 2)
         {
             spawnGuide();
-            moveGuide();
+            updatePosition();
         }
-
     }
-
     private void spawnGuide()
     {
         if(guide == null)
         {
-            guide = GameObject.Instantiate(arnavigation.guidePrefab,currentOrigin().transform.position, guideDirection());
+            guide = GameObject.Instantiate(arnavigation.guidePrefab,guidePosition(), guideDirection());
         }
-        
     }
-    private void moveGuide()
+    private void updatePosition()
     {
-
+        guide.transform.position = guidePosition();
+        guide.transform.rotation = guideDirection();
     }
-    private GameObject currentOrigin() {
+    #endregion Control Functions
+
+    private GameObject origin() {
         return arnavigation.allspawnedObjects[arnavigation.anchorOrder[1]]; //TODO change number
     }
-    private GameObject currentDestination()
+    private GameObject destination()
     {
         return arnavigation.allspawnedObjects[arnavigation.anchorOrder[2]]; //TODO change number
     }
+    private Vector3 guidePosition()
+    {
+        return origin().transform.position + path() * 0.5f;
+    }
     private Quaternion guideDirection()
     {
-        return Quaternion.Euler(direction().x, direction().y, direction().z);
+        return Quaternion.LookRotation(path());
     }
-    private Vector3 direction()
+    private Vector3 path()
     {
-        return new Vector3(
-            currentDestination().transform.position.x - currentOrigin().transform.position.x,
-            currentDestination().transform.position.y - currentOrigin().transform.position.y,
-            currentDestination().transform.position.z - currentOrigin().transform.position.z
-            );
-
+        return destination().transform.position - origin().transform.position;
     }
 }
