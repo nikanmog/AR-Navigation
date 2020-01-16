@@ -36,6 +36,7 @@ public class NavigationGuide : MonoBehaviour
 
     private GameObject origin() {
         return arnavigation.allspawnedObjects[arnavigation.anchorOrder[1]]; //TODO change number
+        
     }
     private GameObject destination()
     {
@@ -43,7 +44,16 @@ public class NavigationGuide : MonoBehaviour
     }
     private Vector3 guidePosition()
     {
-        return origin().transform.position + path() * 0.5f;
+        float multiplicator = 0.0f;
+        float newDistance = 999999.0f;
+        float previousDistance = 99999999.0f;
+        while (newDistance < previousDistance && multiplicator <= 1.0f)
+        {
+            previousDistance = newDistance;
+            newDistance = Vector3.Distance(path() * multiplicator, Camera.main.transform.position);
+            multiplicator += 0.01f;
+        }
+        return origin().transform.position + path() * multiplicator;
     }
     private Quaternion guideDirection()
     {
