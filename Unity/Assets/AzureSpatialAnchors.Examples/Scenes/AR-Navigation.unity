@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a6a76c598bbe6409483d64e72a7bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guidePrefab: {fileID: 5545836629719466296, guid: b1d2ea2fdb7676644868599fd803c97e,
+  guidePrefab: {fileID: 1586873862324705273, guid: fedd5398464a0894d9c10f259d5fe3cc,
     type: 3}
   anchoredObjectPrefab0: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
     type: 3}
@@ -347,6 +347,7 @@ MonoBehaviour:
   anchoredObjectPrefab6: {fileID: 0}
   anchoredObjectPrefab7: {fileID: 0}
   CloudManager: {fileID: 294771744}
+  printmsg: 
 --- !u!4 &294771743
 Transform:
   m_ObjectHideFlags: 0

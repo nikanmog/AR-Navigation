@@ -46,7 +46,7 @@ public class NavigationGuide : MonoBehaviour
     }
     private Vector3 guidePosition()
     {
-
+       
         float multiplicator = 0.0f;
         float newDistance = 999999.0f;
         float previousDistance = 99999999.0f;
@@ -56,14 +56,13 @@ public class NavigationGuide : MonoBehaviour
             newDistance = Vector3.Distance(origin().transform.position + path() * multiplicator, Camera.main.transform.position);
             multiplicator += 0.01f;
         }
-        multiplicator *= 1.2f;
+        multiplicator *= 1.3f;
         if (multiplicator >= 1)
         {
             moveToNextObject();
+            return origin().transform.position + path() * 1.0f;
         }
-        float originDistance = Vector3.Distance(origin().transform.position, Camera.main.transform.position);
-        float destinationDistance = Vector3.Distance(destination().transform.position, Camera.main.transform.position);
-        arnavigation.printmsg = "MP:" + multiplicator + " OR:" + originId +"DistO:"+ originDistance + "DS" + destinationId + "DistT:" + destinationDistance;
+        //arnavigation.printmsg = "MP:" + multiplicator + " OR:" + originId + "DS" + destinationId;
         return origin().transform.position + path() * multiplicator;
     }
     private void moveToNextObject()
