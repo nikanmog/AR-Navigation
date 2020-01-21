@@ -53,7 +53,7 @@ public class NavigationGuide : MonoBehaviour
         while (newDistance < previousDistance && multiplicator <= 1.0f)
         {
             previousDistance = newDistance;
-            newDistance = Vector3.Distance(path() * multiplicator, Camera.main.transform.position);
+            newDistance = Vector3.Distance(origin().transform.position + path() * multiplicator, Camera.main.transform.position);
             multiplicator += 0.01f;
         }
         multiplicator *= 1.2f;
@@ -61,7 +61,9 @@ public class NavigationGuide : MonoBehaviour
         {
             moveToNextObject();
         }
-        arnavigation.printmsg = "MP:" + multiplicator + " OR:" + originId + "DS" + destinationId;
+        float originDistance = Vector3.Distance(origin().transform.position, Camera.main.transform.position);
+        float destinationDistance = Vector3.Distance(destination().transform.position, Camera.main.transform.position);
+        arnavigation.printmsg = "MP:" + multiplicator + " OR:" + originId +"DistO:"+ originDistance + "DS" + destinationId + "DistT:" + destinationDistance;
         return origin().transform.position + path() * multiplicator;
     }
     private void moveToNextObject()
