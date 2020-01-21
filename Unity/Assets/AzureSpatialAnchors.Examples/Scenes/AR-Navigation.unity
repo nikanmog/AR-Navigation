@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a6a76c598bbe6409483d64e72a7bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guidePrefab: {fileID: 1586873862324705273, guid: fedd5398464a0894d9c10f259d5fe3cc,
+  guidePrefab: {fileID: -927199367670048503, guid: 407b241d9855b5a498d198bf0b327c70,
     type: 3}
   anchoredObjectPrefab0: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
     type: 3}
