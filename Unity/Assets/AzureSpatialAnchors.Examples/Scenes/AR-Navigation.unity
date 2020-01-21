@@ -333,9 +333,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   guidePrefab: {fileID: 2016561485020623074, guid: d66b76f83e2dd434ea1412f85887c02b,
     type: 3}
-  anchoredObjectPrefab0: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
+  anchoredObjectPrefab0: {fileID: 1147623660883556, guid: e593bfccf03b6444da88c7591f906ba8,
     type: 3}
-  anchoredObjectPrefab1: {fileID: 1147623660883556, guid: b340d9f0d9ea4ed448c84146e7ff9659,
+  anchoredObjectPrefab1: {fileID: 1147623660883556, guid: e593bfccf03b6444da88c7591f906ba8,
     type: 3}
   anchoredObjectPrefab2: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
     type: 3}
