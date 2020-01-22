@@ -114,7 +114,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Update()
         {
             guide.Update();
-            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count})";
+            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg}";
             base.Update();
             switch (currentAppState)
             {
@@ -134,6 +134,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
                     if (locatedCount == numToMake - 1)
                     {
+                        printmsg = "";
                         feedbackBox.text = "";
                     }
                     break;
@@ -225,12 +226,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             if (allspawnedObjects.Count < numToMake)
             {
+                printmsg = "";
                 feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
                 currentAppState = AppState.Placing;
                 CloudManager.StopSession();
             }
             else
             {
+                printmsg = "";
                 feedbackBox.text = "Saved... ready to start finding them.";
                 CloudManager.StopSession();
                 currentAppState = AppState.ReadyToSearch;
@@ -257,12 +260,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 await Task.Delay(330);
                 float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
+                printmsg = $"Move your device to capture more environment data: {createProgress:0%}";
                 feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
                 // scanImage.SetActive(true);
             }
 
             bool success = false;
             //scanImage.SetActive(false);
+            printmsg = "Saving...";
             feedbackBox.text = "Saving...";
 
             try
