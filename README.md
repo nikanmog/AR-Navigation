@@ -1,41 +1,29 @@
-# Azure Spatial Anchors Samples
+# Azure Spatial Anchors Navigation Demo
 
-Welcome to the Azure Spatial Anchors samples repository on GitHub. Azure Spatial Anchors is a managed cloud service and platform that enables multi-user, spatially aware mixed reality and augmented reality (MR/AR) apps for HoloLens, iOS devices with ARKit, and Android devices with ARCore. For more information, see [Azure Spatial Anchors documentation](https://docs.microsoft.com/azure/spatial-anchors/overview "Azure Spatial Anchors Documentation")
+Welcome to the ASA Navigation repository on GitHub. Here you can find an indoor navigation that was build using the ASA service. The app is capable of guiding a user on a predefined path (an animated dog is the "guide") and includes multi-platform support (iOS/Android/HoloLens).
 
-## Create your first app
+Azure Spatial Anchors is a managed cloud service and platform that enables multi-user, spatially aware mixed reality and augmented reality (MR/AR) apps for HoloLens, iOS devices with ARKit, and Android devices with ARCore. For more information, see [Azure Spatial Anchors documentation](https://docs.microsoft.com/azure/spatial-anchors/overview "Azure Spatial Anchors Documentation")
 
-[Android Java](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-android "Android Quickstart")
+![Implementation System Overview](SystemOverview.jpg "Implementation System Overview")
+## Get Started
+(Please use the official documentation for more detailled instructions)
 
-[HoloLens C++](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-hololens "HoloLens C++ Quickstart")
+1. Clone the repository from GitHub
+2. Open the "Sharing" folder and create/publish your own webapp to Azure
+3. Get the latest version of Unity (incl. all relevant SDKs, e.g. Android/iOS/UWP) and open the local repository
+4. Update references to the webapp, the ASA service and CosmosDB as outlined [in the documentation](https://docs.microsoft.com/azure/spatial-anchors/tutorials/tutorial-use-cosmos-db-to-store-anchors "Azure Spatial Anchors Documentation").
+5. Build and deploy the app
+6. Create and persist anchors by placing them in the world, then restart the app to get into visitor mode
+7. The app will automatically detect whether anchors have already been created and launch the correct mode, to replace existing anchors, please delete all anchors via the REST api of the webapp.
 
-[iOS Swift/Objective-C](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-ios "iOS Quickstart")
-
-[Unity on Android](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-unity-android "Unity Android Quickstart")
-
-[Unity on HoloLens](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-unity-hololens "Unity HoloLens Quickstart")
-
-[Unity on iOS](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-unity-ios "Unity iOS Quickstart")
-
-[Xamarin on Android](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-xamarin-android "Xamarin Android Quickstart")
-
-[Xamarin on iOS](https://docs.microsoft.com/azure/spatial-anchors/quickstarts/get-started-xamarin-ios "Xamarin iOS Quickstart")
-
-## Enable sharing in MR/AR across sessions and devices
-
-[MR/AR sharing across devices and sessions](https://docs.microsoft.com/azure/spatial-anchors/tutorials/tutorial-use-cosmos-db-to-store-anchors "Sharing across sessions")
-
-## Key Concepts
+## More information about the Azure Spatial Anchors Service 
 
 [Create and locate anchors](https://docs.microsoft.com/azure/spatial-anchors/concepts/create-locate-anchors-unity "Create/locate anchors")
+
+[MR/AR sharing across devices and sessions](https://docs.microsoft.com/azure/spatial-anchors/tutorials/tutorial-use-cosmos-db-to-store-anchors "Sharing across sessions")
 
 [Anchor Relationships](https://docs.microsoft.com/azure/spatial-anchors/concepts/anchor-relationships-way-finding "Anchor Relationships")
 
 [Experience Guidelines](https://docs.microsoft.com/en-us/azure/spatial-anchors/concepts/guidelines-effective-anchor-experiences "Experience Guidelines")
 
 [Frequently Asked Questions (FAQ)](https://docs.microsoft.com/azure/spatial-anchors/spatial-anchor-faq "FAQ")
-
-## Support
-
-Have an idea or suggestion? [Give us your feedback](https://feedback.azure.com/forums/919252-azure-spatial-anchors "Feedback")
-
-Have an issue? [Ask the community on Stack Overflow](https://stackoverflow.com/questions/tagged/azure-spatial-anchors "Stack Overflow") OR [Open a support ticket](https://docs.microsoft.com/azure/spatial-anchors/spatial-anchor-support "Support Ticket")
