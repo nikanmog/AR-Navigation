@@ -164,7 +164,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Searching;
                     break;
-                case AppState.ReadyToNeighborQuery:
+                case AppState.ReadyToNeighborQuery: //Currently disabled in OnCloudAnchorLocated
                     SetGraphEnabled(true);
                     anchorTypes = new Dictionary<string, int>();
                     SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
@@ -194,10 +194,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                     spawnedObject = null;
 
-                    if (currentAppState == AppState.Searching)
-                    {
-                        currentAppState = AppState.ReadyToNeighborQuery;
-                    }
+                    //if (currentAppState == AppState.Searching)
+                    //{
+                    //    currentAppState = AppState.ReadyToNeighborQuery;
+                    //}
                 });
             }
         }
