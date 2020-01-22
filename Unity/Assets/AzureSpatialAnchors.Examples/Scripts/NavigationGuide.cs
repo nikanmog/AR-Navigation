@@ -9,6 +9,7 @@ public class NavigationGuide : MonoBehaviour
     private Animation anim;
     private int originId = 1;
     private int destinationId = 2;
+    private bool reachedDestination = false;
     #endregion Object Members
     #region Control Functions
     public NavigationGuide(ARNavigation arNavigation)
@@ -66,17 +67,19 @@ public class NavigationGuide : MonoBehaviour
     #endregion Helper Functions
     private void updateBehaviour()
     {
-        guide.transform.position = guidePosition();
-        if (originId == 1 && guideProgress() <= 0.03f )
+        if (originId == 1 && guideProgress() <= 0.03f && !reachedDestination)
         { // At start
+            guide.transform.position = guidePosition();
             guide.transform.rotation = guideToCamera();
             anim.Play("0|shake_0");
-        } else if (destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.97f)
+        } else if ((destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.97f )|| reachedDestination)
         { // At destination
+            reachedDestination = true;
             guide.transform.rotation = guideToCamera();
             anim.Play("0|rollover_0");
         } else
         { // On the move
+            guide.transform.position = guidePosition();
             guide.transform.rotation = guideDirection();
             anim.Play("0|standing_0");
         }
@@ -97,7 +100,7 @@ public class NavigationGuide : MonoBehaviour
     }
     private Vector3 guidePosition()
     {
-        float multiplicator = guideProgress() * 1.3f;
+        float multiplicator = guideProgress() * 1.4f;
         if (multiplicator >= 1)
         {
             moveToNextObject();
