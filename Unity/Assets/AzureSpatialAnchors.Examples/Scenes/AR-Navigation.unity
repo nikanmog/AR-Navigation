@@ -331,19 +331,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9a6a76c598bbe6409483d64e72a7bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  anchoredObjectPrefab0: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
+  guidePrefab: {fileID: 2016561485020623074, guid: d66b76f83e2dd434ea1412f85887c02b,
     type: 3}
-  anchoredObjectPrefab1: {fileID: 1147623660883556, guid: b340d9f0d9ea4ed448c84146e7ff9659,
+  anchoredObjectPrefab0: {fileID: 1147623660883556, guid: e593bfccf03b6444da88c7591f906ba8,
+    type: 3}
+  anchoredObjectPrefab1: {fileID: 1147623660883556, guid: e593bfccf03b6444da88c7591f906ba8,
     type: 3}
   anchoredObjectPrefab2: {fileID: 1147623660883556, guid: 2f77c560faa031342b168e4f8eb37672,
     type: 3}
   anchoredObjectPrefab3: {fileID: 1147623660883556, guid: b340d9f0d9ea4ed448c84146e7ff9659,
     type: 3}
-  anchoredObjectPrefab4: {fileID: 0}
+  anchoredObjectPrefab4: {fileID: 1147623660883556, guid: b340d9f0d9ea4ed448c84146e7ff9659,
+    type: 3}
   anchoredObjectPrefab5: {fileID: 0}
   anchoredObjectPrefab6: {fileID: 0}
   anchoredObjectPrefab7: {fileID: 0}
   CloudManager: {fileID: 294771744}
+  printmsg: 
 --- !u!4 &294771743
 Transform:
   m_ObjectHideFlags: 0
@@ -522,7 +526,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &356332805
 RectTransform:
   m_ObjectHideFlags: 0
@@ -601,7 +605,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &504627817
 RectTransform:
   m_ObjectHideFlags: 0
@@ -841,7 +845,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &537505715
 RectTransform:
   m_ObjectHideFlags: 0

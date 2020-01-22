@@ -11,6 +11,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     {
         #region Unity Inspector Variables
         [SerializeField]
+        [Tooltip("Guide")]
+        public GameObject guidePrefab = null;
+        [SerializeField]
         [Tooltip("The prefab used to represent an anchored object.")]
         private GameObject anchoredObjectPrefab0 = null;
         [SerializeField]
@@ -60,7 +63,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         private AppState currentAppState = AppState.Initializing;
         private bool isErrorActive = false;
-        private string printmsg = "";
+        public string printmsg = "";
         private readonly int numToMake = 7;
         private int locatedCount = 0;
         #endregion Helper Variables
@@ -69,14 +72,15 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private AnchorLocateCriteria anchorLocateCriteria = null;
         private CloudSpatialAnchor currentCloudAnchor;
         private CloudSpatialAnchorWatcher currentWatcher;
+        private NavigationGuide guide;
         #endregion Class References
         #region Game Objects
         private GameObject spawnedObject = null;
         private Material spawnedObjectMat = null;
         private Text feedbackBox;
-
-        private Dictionary<string, int> anchors = new Dictionary<string, int>();
-        private Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
+        public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
+        private Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
+        public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
 
@@ -86,7 +90,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Start()
         {
-
+            guide = new NavigationGuide(this);
             string BaseSharingUrl = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
             Uri result;
             if (Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
@@ -102,24 +106,26 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             CloudManager.Error += CloudManager_Error;
             anchorLocateCriteria = new AnchorLocateCriteria();
             base.Start();
+            
         }
         /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         public override void Update()
         {
-            feedbackBox.text = $"Mode: {currentAppState}, AnchorIDs Count: {anchors.Count}, locatedCount: {locatedCount}, print: {printmsg}";
+            guide.Update();
+            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg}";
             base.Update();
             switch (currentAppState)
             {
-
                 case AppState.Initializing:
-                    anchors = anchorExchanger.anchorkeys;
+                    anchorTypes = anchorExchanger.anchorTypes;
+                    anchorOrder = anchorExchanger.anchorOrder;
                     if (anchorExchanger.anchorAmount == 0)
                     {
                         currentAppState = AppState.Placing;
                     }
-                    if (anchors.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
+                    if (anchorTypes.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
                     {
                         currentAppState = AppState.ReadyToSearch;
                     }
@@ -128,17 +134,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
                     if (locatedCount == numToMake - 1)
                     {
+                        printmsg = "";
                         feedbackBox.text = "";
                     }
                     break;
             }
+
         }
         public async Task AdvanceDemoAsync()
         {
             switch (currentAppState)
             {
                 case AppState.Placing:
-                    printmsg = "adv1a";
                     if (spawnedObject != null)
                     {
                         currentAppState = AppState.Saving;
@@ -148,28 +155,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                         }
                         await SaveCurrentObjectAnchorToCloudAsync();
                     }
-                    printmsg = "adv1b";
                     break;
                 case AppState.ReadyToSearch:
-                    printmsg = "adv2a";
                     await CloudManager.ResetSessionAsync();
                     await CloudManager.StartSessionAsync();
                     SetGraphEnabled(true);
-                    anchorLocateCriteria.Identifiers = new List<String>(anchors.Keys).ToArray();
+                    anchorLocateCriteria.Identifiers = new List<String>(anchorTypes.Keys).ToArray();
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Searching;
-                    printmsg = "adv2b";
                     break;
-                case AppState.ReadyToNeighborQuery:
-                    printmsg = "adv3a";
+                case AppState.ReadyToNeighborQuery: //Currently disabled in OnCloudAnchorLocated
                     SetGraphEnabled(true);
-                    anchors = new Dictionary<string, int>();
+                    anchorTypes = new Dictionary<string, int>();
                     SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
                     locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Neighboring;
-                    printmsg = "adv3b";
                     break;
 
             }
@@ -193,10 +195,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                     spawnedObject = null;
 
-                    if (currentAppState == AppState.Searching)
-                    {
-                        currentAppState = AppState.ReadyToNeighborQuery;
-                    }
+                    //if (currentAppState == AppState.Searching)
+                    //{
+                    //    currentAppState = AppState.ReadyToNeighborQuery;
+                    //}
                 });
             }
         }
@@ -204,7 +206,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
 
             Debug.Log("Anchor created, yay!");
-            anchors.Add(currentCloudAnchor.Identifier, 0);
+            anchorTypes.Add(currentCloudAnchor.Identifier, 0);
 
             await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
 
@@ -224,12 +226,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             if (allspawnedObjects.Count < numToMake)
             {
+                printmsg = "";
                 feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
                 currentAppState = AppState.Placing;
                 CloudManager.StopSession();
             }
             else
             {
+                printmsg = "";
                 feedbackBox.text = "Saved... ready to start finding them.";
                 CloudManager.StopSession();
                 currentAppState = AppState.ReadyToSearch;
@@ -256,12 +260,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 await Task.Delay(330);
                 float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
+                printmsg = $"Move your device to capture more environment data: {createProgress:0%}";
                 feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
                 // scanImage.SetActive(true);
             }
 
             bool success = false;
             //scanImage.SetActive(false);
+            printmsg = "Saving...";
             feedbackBox.text = "Saving...";
 
             try
@@ -388,7 +394,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 #if WINDOWS_UWP || UNITY_WSA
             if (currentCloudAnchor != null && spawnedObjectsInCurrentAppState.ContainsKey(currentCloudAnchor.Identifier) == false)
             {
-                spawnedObjectsInCurrentAppState.Add(currentCloudAnchor.Identifier, spawnedObject);
+                allspawnedObjects.Add(currentCloudAnchor.Identifier, spawnedObject);
             }
 #endif
         }
