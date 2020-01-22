@@ -67,11 +67,11 @@ public class NavigationGuide : MonoBehaviour
     private void updateBehaviour()
     {
         guide.transform.position = guidePosition();
-        if (originId == 1 && guideProgress() <= 0.1f )
+        if (originId == 1 && guideProgress() <= 0.03f )
         { // At start
             guide.transform.rotation = guideToCamera();
             anim.Play("0|shake_0");
-        } else if (destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.9f)
+        } else if (destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.97f)
         { // At destination
             guide.transform.rotation = guideToCamera();
             anim.Play("0|rollover_0");
@@ -82,7 +82,6 @@ public class NavigationGuide : MonoBehaviour
         }
 
     }
-
     private float guideProgress()
     {
         float multiplicator = 0.0f;
