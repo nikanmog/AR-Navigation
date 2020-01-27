@@ -5,7 +5,7 @@ Welcome to the ASA Navigation repository on GitHub. Here you can find an indoor 
 
 Azure Spatial Anchors is a managed cloud service and platform that enables multi-user, spatially aware mixed reality and augmented reality (MR/AR) apps for HoloLens, iOS devices with ARKit, and Android devices with ARCore. For more information, see [Azure Spatial Anchors documentation](https://docs.microsoft.com/azure/spatial-anchors/overview "Azure Spatial Anchors Documentation")
 
-![Implementation System Overview](SystemOverview.jpg "Implementation System Overview")
+![Implementation System Overview](Unity/SystemOverview.jpg "Implementation System Overview")
 # Get Started
 
 This tutorial is a modified version of the original documentation found [here](https://docs.microsoft.com/en-us/azure/spatial-anchors/tutorials/tutorial-share-anchors-across-devices?tabs=VS%2CUnity).
