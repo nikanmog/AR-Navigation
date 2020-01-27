@@ -8,7 +8,7 @@ Azure Spatial Anchors is a managed cloud service and platform that enables multi
 ![Implementation System Overview](SystemOverview.jpg "Implementation System Overview")
 # Get Started
 
-This tutorial is a modified version of the original documentation found [here]([https://docs.microsoft.com/en-us/azure/spatial-anchors/tutorials/tutorial-share-anchors-across-devices?tabs=VS%2CUnity#feedback](https://docs.microsoft.com/en-us/azure/spatial-anchors/tutorials/tutorial-share-anchors-across-devices?tabs=VS%2CUnity#feedback)).
+This tutorial is a modified version of the original documentation found [here](https://docs.microsoft.com/en-us/azure/spatial-anchors/tutorials/tutorial-share-anchors-across-devices?tabs=VS%2CUnity).
 
 ## Prerequisites
 
