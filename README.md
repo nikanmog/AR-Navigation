@@ -33,19 +33,12 @@ This tutorial is a modified version of the original documentation found [here](h
 ## Prerequisites
 
 To complete this tutorial, make sure you have:
+- Download and install GitHub Desktop
+- Download install UnityHub and create a unity account
+- Download and install the latest version of Unity in Unity Hub. **Important:**
+- Make sure Visual Studio is selected in the installer **and**
+- Depending on your platform, select Universal Windows Platform, iOS or Android Build Support (make sure to open the dropdown menu and select Android SDK as well)
 
--   Basic knowledge on C# and Unity.
--   Basic knowledge on  [ARCore](https://developers.google.com/ar/discover/)  if you want to use Android, or  [ARKit](https://developer.apple.com/arkit/)  if you want to use iOS.
--   A Windows computer on which  [Visual Studio 2017](https://www.visualstudio.com/downloads/)  or later is installed with the  **ASP.NET and web development**  workload.
--   The  [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download).
--   One or more devices (iOS or Android) on which to deploy and run an app.
-    -   If you're using Android, you need to have:
-        -   [Android Studio 3.3](https://developer.android.com/studio/)  or later,  [Unity 2019.1](https://unity3d.com/get-unity/download)  or later, and  [Git for Windows](https://git-scm.com/download/win)  installed on your Windows computer.
-        -   A  [developer-enabled](https://developer.android.com/studio/debug/dev-options)  and  [ARCore-capable](https://developers.google.com/ar/discover/supported-devices)  Android device.
-    -   If you're using iOS, you need to have:
-        -   A macOS computer on which  [Xcode 10](https://geo.itunes.apple.com/us/app/xcode/id497799835?mt=12)  or later,  [CocoaPods](https://cocoapods.org/), and  [Unity 2019.1](https://unity3d.com/get-unity/download)  or later are installed.
-        -   A developer-enabled  [ARKit-compatible](https://developer.apple.com/documentation/arkit/verifying_device_support_and_user_permission)  iOS device.
-        -   Git installed via Homebrew. Enter the following command on a single line in the Terminal:  `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`  Then run  `brew install git`.
   
 ## Download this repository
 Clone this repository with GitHub Desktop or git clone (console).
@@ -177,7 +170,7 @@ After the wizard finishes, it publishes the ASP.NET Core web app to Azure and th
 The app name you used in this section is used as the URL prefix in the format  `https://<app_name>.azurewebsites.net`. Take note of this URL because you'll need it.
 
 ## Deploy the sample app
-In UnityHub (Projects-> Add), open the the  `Unity`  folder. Unity might prompt you about a different Unity version between the project and the one you've installed on your machine. This warning is okay, as long as your version of Unity Editor is newer than the one the project was created with. In that case, just click  **Continue**. If your Unity Editor version is older than the one the project needs, click  **Quit**, and upgrade your Unity Editor.
+In UnityHub (Projects-> Add), open the the  `Unity`  folder. If the 'Unity Version' column is empty, select your current unity version. Unity might prompt you about a different Unity version between the project and the one you've installed on your machine. This warning is okay, as long as your version of Unity Editor is newer than the one the project was created with. In that case, just click  **Continue**. If your Unity Editor version is older than the one the project needs, click  **Quit**, and upgrade your Unity Editor.
 
 ![Unity window](https://docs.microsoft.com/en-us/azure/includes/media/spatial-anchors-unity/unity-window.png)
 
