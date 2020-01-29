@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+// Comment out the next line to use CosmosDb instead of InMemory for the anchor cache.
+//#define INMEMORY_DEMO
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,7 +26,7 @@ namespace SharingService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            
+
             // Register the anchor key cache.
 
             services.AddSingleton<CosmosDbCache>(new CosmosDbCache(this.Configuration.GetValue<string>("StorageConnectionString")));
