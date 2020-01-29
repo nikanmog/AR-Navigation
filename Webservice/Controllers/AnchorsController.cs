@@ -21,6 +21,18 @@ namespace webservice.Controllers
             _context = context;
         }
 
+        // GET: api/Anchors/5
+        [HttpGet("Test")]
+        public async Task<ActionResult<String>> GetAnchor2()
+        {
+            //return _context.test();
+            await _context.Anchors.FindAsync(1);
+            //return anchor.Timestamp.ToString();
+            return "success";
+        }
+
+
+
         // GET: api/Anchors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Anchor>>> GetAnchors()

@@ -18,5 +18,9 @@ namespace webservice.Models
 
         public DbSet<Anchor> Anchors { get; set; }
 
+        public String test()
+        {
+            return "";
+        }
     }
 }
