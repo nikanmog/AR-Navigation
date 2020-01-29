@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,113 +12,69 @@ using webservice.Models;
 
 namespace webservice.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/anchors")]
     [ApiController]
     public class AnchorsController : ControllerBase
     {
         private readonly AnchorsContext _context;
-
         public AnchorsController(AnchorsContext context)
         {
             _context = context;
         }
-
-        // GET: api/Anchors/5
-        [HttpGet("Test")]
-        public async Task<ActionResult<String>> GetAnchor2()
+        [HttpGet("{anchorNumber}/key")]
+        public async Task<ActionResult<String>> GetAnchorKey(int anchorNumber)
         {
-            //return _context.test();
-            await _context.Anchors.FindAsync(1);
-            //return anchor.Timestamp.ToString();
-            return "success";
-        }
-
-
-
-        // GET: api/Anchors
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Anchor>>> GetAnchors()
-        {
-            return await _context.Anchors.ToListAsync();
-        }
-
-        // GET: api/Anchors/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Anchor>> GetAnchor(long id)
-        {
-            var anchor = await _context.Anchors.FindAsync(id);
+            var anchor = await _context.Anchors.FindAsync(anchorNumber);
 
             if (anchor == null)
             {
                 return NotFound();
             }
 
-            return anchor;
+            return anchor.AnchorKey;
         }
-
-        // PUT: api/Anchors/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAnchor(long id, Anchor anchor)
+        [HttpGet("{anchorNumber}/type")]
+        public async Task<ActionResult<int>> GetAnchorType(int anchorNumber)
         {
-            if (id != anchor.Id)
+            var anchor = await _context.Anchors.FindAsync(anchorNumber);
+            if (anchor == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-
-            _context.Entry(anchor).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AnchorExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return anchor.AnchorType;
         }
-
-        // POST: api/Anchors
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> CountAnchors()
+        {
+            return await _context.Anchors.CountAsync(); 
+        }
         [HttpPost]
-        public async Task<ActionResult<Anchor>> PostAnchor(Anchor anchor)
+        public async Task<ActionResult<int>> PostAsync()
         {
-            _context.Anchors.Add(anchor);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetAnchor", new { id = anchor.Id }, anchor);
-        }
-
-        // DELETE: api/Anchors/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Anchor>> DeleteAnchor(long id)
-        {
-            var anchor = await _context.Anchors.FindAsync(id);
-            if (anchor == null)
+            string anchorKey;
+            using (StreamReader reader = new StreamReader(this.Request.Body, Encoding.UTF8))
             {
-                return NotFound();
+                anchorKey = await reader.ReadToEndAsync();
             }
 
-            _context.Anchors.Remove(anchor);
-            await _context.SaveChangesAsync();
+            if (string.IsNullOrWhiteSpace(anchorKey))
+            {
+                return this.BadRequest();
+            }
 
-            return anchor;
+            var anchor = new Anchor();
+            anchor.AnchorKey = anchorKey;
+            anchor.Id = _context.Anchors.Count()+1;
+            anchor.Demo = "default";
+            anchor.Timestamp = DateTime.Now;
+            _context.Anchors.Add(anchor);
+            _context.SaveChanges();
+            return anchor.Id;
         }
-
-        private bool AnchorExists(long id)
+        [HttpDelete]
+        public void DeleteAnchor()
         {
-            return _context.Anchors.Any(e => e.Id == id);
+            _context.Database.ExecuteSqlRaw("delete from Anchors");
         }
     }
 }
