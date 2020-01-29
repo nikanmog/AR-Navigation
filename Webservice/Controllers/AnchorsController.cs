@@ -20,6 +20,7 @@ namespace webservice.Controllers
         public AnchorsController(AnchorsContext context)
         {
             _context = context;
+            _context.Database.EnsureCreated();
         }
         [HttpGet("{anchorNumber}/key")]
         public async Task<ActionResult<String>> GetAnchorKey(int anchorNumber)
@@ -64,7 +65,6 @@ namespace webservice.Controllers
 
             var anchor = new Anchor();
             anchor.AnchorKey = anchorKey;
-            anchor.Id = _context.Anchors.Count()+1;
             anchor.Demo = "default";
             anchor.Timestamp = DateTime.Now;
             _context.Anchors.Add(anchor);
