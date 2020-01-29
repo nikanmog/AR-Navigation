@@ -16,17 +16,15 @@ namespace SharingService.Controllers
     {
         private readonly CosmosDbCache anchorKeyCache;
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AnchorsController"/> class.
         /// </summary>
         /// <param name="anchorKeyCache">The anchor key cache.</param>
-        public AnchorsController(CosmosDbCache anchorKeyCache)
+        public AnchorsController(SQLConnection anchorKeyCache)
         {
-            this.anchorKeyCache = anchorKeyCache;
+            //this.anchorKeyCache = anchorKeyCache;
         }
-
-
-
 
         // GET api/anchors/5
         [HttpGet("{anchorNumber}/key")]
