@@ -74,7 +74,8 @@ namespace webservice.Controllers
         [HttpDelete]
         public void DeleteAnchor()
         {
-            _context.Database.ExecuteSqlRaw("delete from Anchors");
+            _context.Database.ExecuteSqlRaw("drop table Anchors");
+            _context.Database.EnsureCreated();
         }
     }
 }
