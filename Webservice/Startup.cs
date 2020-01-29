@@ -28,7 +28,8 @@ namespace webservice
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AnchorsContext>(opt => opt.UseInMemoryDatabase("Anchors"));
+            //services.AddDbContext<AnchorsContext>(opt => opt.UseInMemoryDatabase("Anchors"));
+            services.AddDbContext<AnchorsContext>(opt => opt.UseSqlServer("Server=tcp:ar-navigation.database.windows.net,1433;Initial Catalog=anchors;Persist Security Info=False;User ID=ar-navigation-admin;Password=VBbzfJ8ybbpPhutcUOqa;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AR-Navigation Backend", Version = "v1" });
