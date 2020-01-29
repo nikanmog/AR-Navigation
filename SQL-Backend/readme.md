@@ -11,9 +11,13 @@
 3.  On the  **Create SQL Database**  page, enter the settings for the new Azure SQL Database:
 
 	Subscription: Your subscription
+	
 Resource Group: Use the same RG
+
 Database Name: Enter a unique name, **Remember this for later**
+
 Server: Create New, Basic server (4$/month) is sufficient
+
 **Important:** Please remember your sql username and password for later. 
 ![Screenshot](step2.jpg)
 
