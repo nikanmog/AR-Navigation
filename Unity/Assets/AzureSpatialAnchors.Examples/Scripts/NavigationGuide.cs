@@ -72,7 +72,7 @@ public class NavigationGuide : MonoBehaviour
             guide.transform.position = guidePosition();
             guide.transform.rotation = guideToCamera();
             anim.Play("0|shake_0");
-        } else if ((destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.97f )|| reachedDestination)
+        } else if ((destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.90f )|| reachedDestination)
         { // At destination
             reachedDestination = true;
             guide.transform.rotation = guideToCamera();
@@ -90,11 +90,10 @@ public class NavigationGuide : MonoBehaviour
         float multiplicator = 0.0f;
         float newDistance = 999999.0f;
         float previousDistance = 99999999.0f;
-        while (newDistance < previousDistance && multiplicator <= 1.0f)
+        for (multiplicator = 0.0f; newDistance < previousDistance && multiplicator <= 1.0f; multiplicator += 0.001f)
         {
             previousDistance = newDistance;
             newDistance = Vector3.Distance(origin().transform.position + path() * multiplicator, Camera.main.transform.position);
-            multiplicator += 0.001f;
         }
         return multiplicator;
     }

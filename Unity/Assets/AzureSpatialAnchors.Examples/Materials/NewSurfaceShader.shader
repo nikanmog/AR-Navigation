@@ -35,3 +35,4 @@
 			}
 		}
 			Fallback "Transparent/Cutout/VertexLit"
+}
