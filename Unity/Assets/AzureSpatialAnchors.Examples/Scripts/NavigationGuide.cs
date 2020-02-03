@@ -94,7 +94,7 @@ public class NavigationGuide : MonoBehaviour
         {
             previousDistance = newDistance;
             newDistance = Vector3.Distance(origin().transform.position + path() * multiplicator, Camera.main.transform.position);
-            multiplicator += 0.01f;
+            multiplicator += 0.001f;
         }
         return multiplicator;
     }
