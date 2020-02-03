@@ -8814,11 +8814,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\t-nimogh\\Code\\AR-Navigation-Private\\Webservice\\webservice.csproj",
+      "projectUniqueName": "C:\\Users\\t-nimogh\\Code\\AR-Navigation-Private\\SQL-Backend\\webservice.csproj",
       "projectName": "webservice",
-      "projectPath": "C:\\Users\\t-nimogh\\Code\\AR-Navigation-Private\\Webservice\\webservice.csproj",
+      "projectPath": "C:\\Users\\t-nimogh\\Code\\AR-Navigation-Private\\SQL-Backend\\webservice.csproj",
       "packagesPath": "C:\\Users\\t-nimogh\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\t-nimogh\\Code\\AR-Navigation-Private\\Webservice\\obj\\",
+      "outputPath": "C:\\Users\\t-nimogh\\Code\\AR-Navigation-Private\\SQL-Backend\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
