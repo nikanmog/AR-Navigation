@@ -49,6 +49,12 @@ namespace webservice.Controllers
         {
             return await _context.Anchors.CountAsync(); 
         }
+        // GET: api/Anchors
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Anchor>>> GetAnchors()
+        {
+            return await _context.Anchors.ToListAsync();
+        }
         [HttpPost]
         public async Task<ActionResult<int>> PostAsync()
         {
@@ -66,7 +72,6 @@ namespace webservice.Controllers
             var anchor = new Anchor();
             anchor.AnchorKey = anchorKey;
             anchor.Demo = "default";
-            anchor.Timestamp = DateTime.Now;
             _context.Anchors.Add(anchor);
             _context.SaveChanges();
             return anchor.Id;

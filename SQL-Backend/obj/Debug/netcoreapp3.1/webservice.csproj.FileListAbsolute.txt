@@ -147,3 +147,12 @@ C:\Users\t-nimogh\Code\AR-Navigation-Private\Webservice\bin\Debug\netcoreapp3.1\
 C:\Users\t-nimogh\Code\AR-Navigation-Private\Webservice\bin\Debug\netcoreapp3.1\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\t-nimogh\Code\AR-Navigation-Private\Webservice\bin\Debug\netcoreapp3.1\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\t-nimogh\Code\AR-Navigation-Private\Webservice\bin\Debug\netcoreapp3.1\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.csprojAssemblyReference.cache
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\staticwebassets\webservice.StaticWebAssets.Manifest.cache
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\staticwebassets\webservice.StaticWebAssets.xml
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.AssemblyInfoInputs.cache
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.AssemblyInfo.cs
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.dll
+C:\Users\t-nimogh\Code\AR-Navigation-Private\SQL-Backend\obj\Debug\netcoreapp3.1\webservice.pdb

@@ -12,6 +12,5 @@ namespace webservice.Model
             public string Demo { get; set; }
             public string AnchorKey { get; set; }
             public int AnchorType { get; set; }
-            public DateTime Timestamp { get; set; }
     }
 }

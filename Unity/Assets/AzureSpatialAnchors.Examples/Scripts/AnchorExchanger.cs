@@ -8,16 +8,28 @@ using System.Collections.Generic;
 
 namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
+    [Serializable]
+    public class Anchor
+    {
+        public int id;
+        public string demo;
+        public string anchorKey;
+        public int anchorType;
+    }
     public class AnchorExchanger
     {
         private string baseAddress = "";
+        public string aemsg = "X";
+        private List<Anchor> anchors;
         public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
         public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
         public void GetAnchors(string exchangerUrl)
         {
             baseAddress = exchangerUrl;
-            Task.Factory.StartNew(async () =>
+            getAnchors(exchangerUrl);
+            
+            /*Task.Factory.StartNew(async () =>
             {
                 anchorAmount = await RetrieveAnchorAmount();
                 for (int i = 1; 1 <= anchorAmount ; i++)
@@ -39,6 +51,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     }
                 }
             }, TaskCreationOptions.LongRunning);
+            */
         }
         public int anchorType(string anchorKey)
         {
@@ -93,6 +106,52 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 Debug.LogError("Failed to retrieve last anchor key.");
                 return 0;
             }
+        }
+        private async void getAnchors(string exchangeURL)
+        {
+            string rawmessage = "[]";
+            try
+            {
+                HttpClient client = new HttpClient();
+                rawmessage = await client.GetStringAsync(baseAddress);
+            }
+            catch (Exception)
+            {
+                rawmessage = "[]";
+            }
+            if (rawmessage == "[]")
+            {
+                anchorAmount = 0;
+            }
+            else
+            {
+                string[] splitmessage = rawmessage.Trim(new char[] { '[', ']' }).Replace("},{", "};{").Split(';');
+                Anchor anchorObject = JsonUtility.FromJson<Anchor>(splitmessage[0]);
+                anchorTypes.Add(anchorObject.anchorKey, anchorObject.anchorType);
+                anchorOrder.Add(anchorObject.id, anchorObject.anchorKey);
+                anchors.Add(anchorObject);
+                anchorAmount = 1;
+                aemsg = anchorObject.anchorKey;
+                /*
+                foreach (String singlemessage in splitmessage)
+                {
+                    aemsg = singlemessage;
+                    Anchor anchorObject = JsonUtility.FromJson<Anchor>(singlemessage);
+                    anchors.Add(anchorObject);
+                    lock (anchorTypes)
+                    {
+                        anchorTypes.Add(anchorObject.anchorKey, anchorObject.anchorType);
+                    }
+                    lock (anchorOrder)
+                    {
+                        anchorOrder.Add(anchorObject.id, anchorObject.anchorKey);
+                    }
+                }
+
+                anchorAmount = anchors.Count;
+                */
+            }
+
         }
         internal async Task<long> StoreAnchorKey(string anchorKey)
         {

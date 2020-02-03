@@ -114,7 +114,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Update()
         {
             guide.Update();
-            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg}";
+            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg} {anchorExchanger.aemsg}";
             base.Update();
             switch (currentAppState)
             {
