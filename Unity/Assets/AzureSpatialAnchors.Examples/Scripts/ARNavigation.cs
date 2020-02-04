@@ -114,7 +114,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Update()
         {
             guide.Update();
-            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg} {anchorExchanger.aemsg}";
+            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg}";
             base.Update();
             switch (currentAppState)
             {
@@ -204,11 +204,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         protected async Task OnSaveCloudAnchorSuccessfulAsync()
         {
-
-            Debug.Log("Anchor created, yay!");
             anchorTypes.Add(currentCloudAnchor.Identifier, 0);
 
-            await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
+            printmsg = await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
 
             // Sanity check that the object is still where we expect
             Pose anchorPose = Pose.identity;

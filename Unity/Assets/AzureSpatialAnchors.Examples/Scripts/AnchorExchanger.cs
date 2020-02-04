@@ -12,6 +12,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     [Serializable]
     public class Anchor
     {
+        public Anchor(int id, string demo, string anchorKey, int anchorType)
+        {
+            this.id = id;
+            this.demo = demo;
+            this.anchorKey = anchorKey;
+            this.anchorType = anchorType;
+        }
         public int id;
         public string demo;
         public string anchorKey;
@@ -20,11 +27,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     public class AnchorExchanger
     {
         private string baseAddress = "";
-        public string aemsg = "";
         public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
         public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
-        public async  void GetAnchors(string exchangerUrl)
+        public async void GetAnchors(string exchangerUrl)
         {
             baseAddress = exchangerUrl;
             try
@@ -57,60 +63,29 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             return defaultType;
         }
 
-        internal async Task<long> StoreAnchorKey(string anchorKey)
+        internal async Task<string> StoreAnchorKey(string anchorKey)
         {
             try
             {
-                aemsg = "before";
                 HttpClient client = new HttpClient();
-                Anchor anchor = new Anchor();
-                anchor.anchorKey = anchorKey;
-                anchor.anchorType = 0;
-                anchor.demo = "test";
-                anchor.id = -1;
+                Anchor anchor = new Anchor(0, "Standard", anchorKey, 0);
                 string jsoncontent = JsonUtility.ToJson(anchor);
                 var buffer = System.Text.Encoding.UTF8.GetBytes(jsoncontent);
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 var result = await client.PostAsync(baseAddress, byteContent);
-
-
-                aemsg = result.StatusCode.ToString();
-                string responseBody = await result.Content.ReadAsStringAsync();
-                //aemsg = responseBody;
-
-
-                /*
-                var response = await client.PostAsync(baseAddress, new StringContent(anchorKey));
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    long ret;
-                    if (long.TryParse(responseBody, out ret))
-                    {
-                        Debug.Log("Key " + ret.ToString());
-                        return ret;
-                    }
-                    else
-                    {
-                        Debug.LogError($"Failed to store the anchor key. Failed to parse the response body to a long: {responseBody}.");
-                    }
+                if (result.IsSuccessStatusCode){
+                    return "";
                 }
                 else
                 {
-                    Debug.LogError($"Failed to store the anchor key: {response.StatusCode} {response.ReasonPhrase}.");
+                    return result.StatusCode.ToString();
                 }
-
-                Debug.LogError($"Failed to store the anchor key: {anchorKey}.");
-                return -1;
-
-    */
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return -1;
+                return ex.Message;
             }
-            return 0L;
         }
     }
 }

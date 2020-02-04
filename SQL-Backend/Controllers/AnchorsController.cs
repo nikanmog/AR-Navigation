@@ -19,56 +19,21 @@ namespace webservice.Controllers
             _context = context;
             _context.Database.EnsureCreated();
         }
-
         // GET: api/Anchors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Anchor>>> GetAnchors()
         {
             return await _context.Anchors.ToListAsync();
         }
+        // POST: api/Anchors
         [HttpPost]
         public async Task<ActionResult<Anchor>> PostAsync(Anchor anchor)
         {
-            Anchor save = new Anchor();
-            save.AnchorKey = anchor.AnchorKey;
-            save.AnchorType = anchor.AnchorType;
-            save.Demo = anchor.Demo;
-   
-
-            _context.Anchors.Add(save);
-            await _context.SaveChangesAsync();
-            return save;
-        }
-
-
-
-
-        /*        [HttpPost]
-        public async Task<ActionResult<int>> PostAsync()
-        {
-            string anchorKey;
-            using (StreamReader reader = new StreamReader(this.Request.Body, Encoding.UTF8))
-            {
-                anchorKey = await reader.ReadToEndAsync();
-            }
-
-            if (string.IsNullOrWhiteSpace(anchorKey))
-            {
-                return this.BadRequest();
-            }
-
-            var anchor = new Anchor();
-            anchor.AnchorKey = anchorKey;
-            anchor.Demo = "default";
             _context.Anchors.Add(anchor);
-            _context.SaveChanges();
-            return anchor.Id;
-        }*/
-
-
-
-
-
+            await _context.SaveChangesAsync();
+            return anchor;
+        }
+        // DELETE: api/Anchors
         [HttpDelete]
         public void DeleteAnchor()
         {
