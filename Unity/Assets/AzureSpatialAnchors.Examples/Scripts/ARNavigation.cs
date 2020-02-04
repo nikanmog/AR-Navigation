@@ -66,7 +66,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private int locatedCount = 0;
         #endregion Helper Variables
         #region Class References
-        private AnchorExchanger anchorExchanger = new AnchorExchanger();
+        public AnchorExchanger anchorExchanger = new AnchorExchanger();
         private AnchorLocateCriteria anchorLocateCriteria = null;
         private CloudSpatialAnchor currentCloudAnchor;
         private CloudSpatialAnchorWatcher currentWatcher;
@@ -76,8 +76,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private GameObject spawnedObject = null;
         private Material spawnedObjectMat = null;
         private Text feedbackBox;
-        public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
-        private Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
+
         public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
@@ -86,51 +85,43 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// Start is called on the frame when a script is enabled just before any
         /// of the Update methods are called the first time.
         /// </summary>
-        public override void Start()
+        public override async void Start()
         {
-            guide = new NavigationGuide(this);
-            anchorExchanger.GetAnchors();
-            feedbackBox = XRUXPicker.Instance.GetFeedbackText();
-            CloudManager.SessionUpdated += CloudManager_SessionUpdated;
-            CloudManager.AnchorLocated += CloudManager_AnchorLocated;
-            CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
-            CloudManager.LogDebug += CloudManager_LogDebug;
-            CloudManager.Error += CloudManager_Error;
-            CloudManager.StartSessionAsync();
-            anchorLocateCriteria = new AnchorLocateCriteria();
             base.Start();
+            guide = new NavigationGuide(this);
+            anchorExchanger.getAnchors();
+            feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+
+            CloudManager.AnchorLocated += CloudManager_AnchorLocated;
+  
+            anchorLocateCriteria = new AnchorLocateCriteria();
+            await CloudManager.StartSessionAsync();
         }
         /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         public override void Update()
         {
-            guide.Update();
-            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorTypes.Count}) {printmsg}";
             base.Update();
-            switch (currentAppState)
+            guide.Update();
+            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorExchanger.anchorOrder.Count}) {printmsg}";
+            if (currentAppState == AppState.Initializing)
             {
-                case AppState.Initializing:
-                    anchorTypes = anchorExchanger.anchorTypes;
-                    anchorOrder = anchorExchanger.anchorOrder;
-                    if (anchorExchanger.anchorAmount == 0)
-                    {
-                        currentAppState = AppState.CreatorMode;
-                    }
-                    if (anchorTypes.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
-                    {
-                        
-                        anchorLocateCriteria.Strategy = LocateStrategy.AnyStrategy;
-                        anchorLocateCriteria.Identifiers = new List<String>(anchorTypes.Keys).ToArray();
-                        locatedCount = 0;
-                        currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
-                        currentAppState = AppState.Searching;
-                        break;
-                    }
-                    break;
+                if (anchorExchanger.anchorAmount == 0)
+                {
+                    currentAppState = AppState.CreatorMode;
+                }
+                if (anchorExchanger.anchorAmount > 0)
+                {
+                    anchorLocateCriteria.Strategy = LocateStrategy.AnyStrategy;
+                    anchorLocateCriteria.Identifiers = new List<String>(anchorExchanger.anchorTypes.Keys).ToArray();
+                    locatedCount = 0;
+                    currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
+                    currentAppState = AppState.Searching;
+                }
             }
         }
-        public async Task AdvanceDemoAsync()
+        public async Task PlaceObject()
         {
             if (currentAppState == AppState.CreatorMode && spawnedObject != null)
             {
@@ -142,8 +133,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     await SaveCurrentObjectAnchorToCloudAsync();
             }
         }
-        protected void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
+        private void CloudManager_AnchorLocated(object sender, AnchorLocatedEventArgs args)
         {
+            Debug.LogFormat("Anchor recognized as a possible anchor {0} {1}", args.Identifier, args.Status);
+
             if (args.Status == LocateAnchorStatus.Located)
             {
                 UnityDispatcher.InvokeOnAppThread(() =>
@@ -160,10 +153,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     spawnedObject = null;
                 });
             }
+
         }
         protected async Task OnSaveCloudAnchorSuccessfulAsync()
         {
-            anchorTypes.Add(currentCloudAnchor.Identifier, 0);
+            anchorExchanger.anchorTypes.Add(currentCloudAnchor.Identifier, 0);
 
             printmsg = await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
 
@@ -253,21 +247,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 OnSaveCloudAnchorFailedB(ex);
             }
         }
-        protected void SetNearbyAnchor(CloudSpatialAnchor nearbyAnchor, float DistanceInMeters, int MaxNearAnchorsToFind)
-        {
-            if (nearbyAnchor == null)
-            {
-                anchorLocateCriteria.NearAnchor = new NearAnchorCriteria();
-                return;
-            }
-
-            NearAnchorCriteria nac = new NearAnchorCriteria();
-            nac.SourceAnchor = nearbyAnchor;
-            nac.DistanceInMeters = DistanceInMeters;
-            nac.MaxResultCount = MaxNearAnchorsToFind;
-            anchorLocateCriteria.NearAnchor = nac;
-        }
-
         #region Object Handlers
         /// <summary>
         /// Spawns a new anchored object.
@@ -390,7 +369,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             try
             {
-                await AdvanceDemoAsync();
+                await PlaceObject();
             }
             catch (Exception)
             {
@@ -519,44 +498,5 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
         #endregion Interaction Handlers
-        #region Cloud Manager Default Handlers
-        /// <summary>
-        /// Called when cloud anchor location has completed.
-        /// </summary>
-        /// <param name="args">The <see cref="LocateAnchorsCompletedEventArgs"/> instance containing the event data.</param>
-        protected virtual void OnCloudLocateAnchorsCompleted(LocateAnchorsCompletedEventArgs args)
-        {
-            Debug.Log("Locate pass complete");
-        }
-        protected void OnSaveCloudAnchorFailed(Exception exception)
-        {
-            OnSaveCloudAnchorFailed(exception);
-        }
-        private void CloudManager_AnchorLocated(object sender, AnchorLocatedEventArgs args)
-        {
-            Debug.LogFormat("Anchor recognized as a possible anchor {0} {1}", args.Identifier, args.Status);
-            if (args.Status == LocateAnchorStatus.Located)
-            {
-                OnCloudAnchorLocated(args);
-            }
-        }
-        private void CloudManager_LocateAnchorsCompleted(object sender, LocateAnchorsCompletedEventArgs args)
-        {
-            OnCloudLocateAnchorsCompleted(args);
-        }
-        private void CloudManager_SessionUpdated(object sender, SessionUpdatedEventArgs args)
-        {
-        }
-        private void CloudManager_Error(object sender, SessionErrorEventArgs args)
-        {
-            isErrorActive = true;
-            Debug.Log(args.ErrorMessage);
-            UnityDispatcher.InvokeOnAppThread(() => this.feedbackBox.text = string.Format("Error: {0}", args.ErrorMessage));
-        }
-        private void CloudManager_LogDebug(object sender, OnLogDebugEventArgs args)
-        {
-            Debug.Log(args.Message);
-        }
-        #endregion Cloud Manager Default Handlers
     }
 }

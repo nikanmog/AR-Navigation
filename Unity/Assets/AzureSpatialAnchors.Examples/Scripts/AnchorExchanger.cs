@@ -30,7 +30,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
         public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
-        public async void GetAnchors()
+        public async void getAnchors()
         {
             baseAddress = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
             Uri result;

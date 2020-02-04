@@ -36,16 +36,16 @@ public class NavigationGuide : MonoBehaviour
     #region Helper Functions
     private GameObject origin()
     {
-        return arnavigation.allspawnedObjects[arnavigation.anchorOrder[originId]];
+        return arnavigation.allspawnedObjects[arnavigation.anchorExchanger.anchorOrder[originId]];
 
     }
     private GameObject destination()
     {
-        return arnavigation.allspawnedObjects[arnavigation.anchorOrder[destinationId]];
+        return arnavigation.allspawnedObjects[arnavigation.anchorExchanger.anchorOrder[destinationId]];
     }
     private void moveToNextObject()
     {
-        if (destinationId < arnavigation.anchorOrder.Count)
+        if (destinationId < arnavigation.anchorExchanger.anchorOrder.Count)
         {
             originId += 1;
             destinationId += 1;
@@ -72,7 +72,7 @@ public class NavigationGuide : MonoBehaviour
             guide.transform.position = guidePosition();
             guide.transform.rotation = guideToCamera();
             anim.Play("0|shake_0");
-        } else if ((destinationId == arnavigation.anchorOrder.Count && guideProgress() >= 0.90f )|| reachedDestination)
+        } else if ((destinationId == arnavigation.anchorExchanger.anchorOrder.Count && guideProgress() >= 0.90f )|| reachedDestination)
         { // At destination
             reachedDestination = true;
             guide.transform.rotation = guideToCamera();
