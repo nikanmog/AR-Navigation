@@ -85,9 +85,8 @@ Under  **Settings**, select  **Key**. Copy the  **Primary key**  value into a te
 
 
 ## Create and publish app backend
-You can choose between an SQL server backend and a Cosmos DB backend. You can find the instructions here:
-[Cosmos DB Instructions](Cosmos-Backend/readme.md)
-[SQL Server instructions](SQL-Backend/readme.md)
+Please create the app backend as described [here](SQL-Backend/readme.md)
+
 
 ## Deploy the sample app
 In UnityHub (Projects-> Add), open the the  `Unity`  folder. If the 'Unity Version' column is empty, select your current unity version. Unity might prompt you about a different Unity version between the project and the one you've installed on your machine. This warning is okay, as long as your version of Unity Editor is newer than the one the project was created with. In that case, just click  **Continue**. If your Unity Editor version is older than the one the project needs, click  **Quit**, and upgrade your Unity Editor.
@@ -225,3 +224,6 @@ In Xcode, stop the app by selecting  **Stop**.
 [Experience Guidelines](https://docs.microsoft.com/en-us/azure/spatial-anchors/concepts/guidelines-effective-anchor-experiences "Experience Guidelines")
 
 [Frequently Asked Questions (FAQ)](https://docs.microsoft.com/azure/spatial-anchors/spatial-anchor-faq "FAQ")
+
+## CC Attributions
+Many thanks to Shiba Inu. for his Dog model!
