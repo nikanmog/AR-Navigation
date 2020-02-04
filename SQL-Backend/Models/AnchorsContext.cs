@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using webservice.Model;
 
 namespace webservice.Models
@@ -11,6 +7,5 @@ namespace webservice.Models
     {
         public AnchorsContext(DbContextOptions<AnchorsContext> options) : base(options) { }
         public DbSet<Anchor> Anchors { get; set; }
-
     }
 }

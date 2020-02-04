@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
+
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +12,7 @@ namespace webservice.Controllers
     [ApiController]
     public class AnchorsController : ControllerBase
     {
+        private static string demo = "Default";
         private readonly AnchorsContext _context;
         public AnchorsController(AnchorsContext context)
         {
@@ -23,15 +23,40 @@ namespace webservice.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Anchor>>> GetAnchors()
         {
-            return await _context.Anchors.ToListAsync();
+            List<Anchor> result = await _context.Anchors.ToListAsync();
+            List<Anchor> currentDemoAnchors = result.FindAll(
+                delegate (Anchor a)
+                {
+                    return a.Demo.Equals(demo);
+                }
+            );
+            int i = 1;
+            currentDemoAnchors.ForEach(
+                delegate (Anchor a)
+                {
+                    a.Id = i;
+                    i++;
+                }
+            );
+            return currentDemoAnchors;
         }
         // POST: api/Anchors
         [HttpPost]
         public async Task<ActionResult<Anchor>> PostAsync(Anchor anchor)
         {
-            _context.Anchors.Add(anchor);
+            Anchor savedObject = anchor;
+            savedObject.Demo = demo;
+            _context.Anchors.Add(savedObject);
             await _context.SaveChangesAsync();
             return anchor;
+        }
+        // POST: api/Anchors
+        [HttpPost("setDemo")]
+        public string SetDemo(string demo)
+        {
+            string oldDemo = demo;
+            AnchorsController.demo = demo;
+            return "Changed Demo From " + oldDemo + " to " + demo;
         }
         // DELETE: api/Anchors
         [HttpDelete]
