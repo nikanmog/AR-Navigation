@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webservice.Model;
@@ -22,33 +19,7 @@ namespace webservice.Controllers
             _context = context;
             _context.Database.EnsureCreated();
         }
-        [HttpGet("{anchorNumber}/key")]
-        public async Task<ActionResult<String>> GetAnchorKey(int anchorNumber)
-        {
-            var anchor = await _context.Anchors.FindAsync(anchorNumber);
 
-            if (anchor == null)
-            {
-                return NotFound();
-            }
-
-            return anchor.AnchorKey;
-        }
-        [HttpGet("{anchorNumber}/type")]
-        public async Task<ActionResult<int>> GetAnchorType(int anchorNumber)
-        {
-            var anchor = await _context.Anchors.FindAsync(anchorNumber);
-            if (anchor == null)
-            {
-                return NotFound();
-            }
-            return anchor.AnchorType;
-        }
-        [HttpGet("count")]
-        public async Task<ActionResult<int>> CountAnchors()
-        {
-            return await _context.Anchors.CountAsync(); 
-        }
         // GET: api/Anchors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Anchor>>> GetAnchors()

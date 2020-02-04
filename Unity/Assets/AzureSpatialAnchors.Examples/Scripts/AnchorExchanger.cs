@@ -19,150 +19,48 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     public class AnchorExchanger
     {
         private string baseAddress = "";
-        public string aemsg = "X";
-        private List<Anchor> anchors;
         public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
         public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
-        public void GetAnchors(string exchangerUrl)
+        public async  void GetAnchors(string exchangerUrl)
         {
             baseAddress = exchangerUrl;
-            getAnchors(exchangerUrl);
-            
-            /*Task.Factory.StartNew(async () =>
+            try
             {
-                anchorAmount = await RetrieveAnchorAmount();
-                for (int i = 1; 1 <= anchorAmount ; i++)
+                HttpClient client = new HttpClient();
+                string rawmessage = await client.GetStringAsync(baseAddress);
+                string msg2 = rawmessage.Trim(new char[] { '[', ']' });
+                string msg3 = msg2.Replace("},{", "};{");
+                string[] msg4 = msg3.Split(';');
+                for (int i = 0; i < msg4.Length; i++)
                 {
-                    string currentKey = await RetrieveAnchorKey(i);
-                    int currentType = await RetrieveAnchorType(i);
-                    if (!string.IsNullOrWhiteSpace(currentKey))
-                    {
-                        Debug.Log("Found key " + currentKey);
-                        lock (anchorTypes)
-                        {
-                            anchorTypes.Add(currentKey, currentType);
-                        }
-                        lock (anchorOrder)
-                        {
-                            anchorOrder.Add(i, currentKey);
-                        }
-                        
-                    }
+                    Anchor webAnchor = JsonUtility.FromJson<Anchor>(msg4[i]);
+                    anchorTypes.Add(webAnchor.anchorKey, webAnchor.anchorType);
+                    anchorOrder.Add(webAnchor.id, webAnchor.anchorKey);
                 }
-            }, TaskCreationOptions.LongRunning);
-            */
+                anchorAmount = anchorTypes.Count;
+            }
+            catch (Exception)
+            {
+                anchorAmount = 0;
+            }
         }
         public int anchorType(string anchorKey)
         {
             int defaultType = 1;
-
             if (anchorTypes.ContainsKey(anchorKey))
             {
                 return anchorTypes[anchorKey];
             }
             return defaultType;
         }
-        public async Task<string> RetrieveAnchorKey(long anchorNumber)
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-                return await client.GetStringAsync(baseAddress + "/" + anchorNumber.ToString() + "/key");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to retrieve anchor key for anchor number: {anchorNumber}.");
-                return null;
-            }
-        }
-        public async Task<int> RetrieveAnchorType(long anchorNumber)
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-                return int.Parse(await client.GetStringAsync(baseAddress + "/" + anchorNumber.ToString() + "/type"));
 
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to retrieve anchor key for anchor number: {anchorNumber}.");
-                return 0;
-            }
-        }
-        public async Task<int> RetrieveAnchorAmount()
-        {
-            try
-            {
-                HttpClient client = new HttpClient();
-
-                return int.Parse(await client.GetStringAsync(baseAddress + "/count"));
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-                Debug.LogError("Failed to retrieve last anchor key.");
-                return 0;
-            }
-        }
-        private async void getAnchors(string exchangeURL)
-        {
-            string rawmessage = "[]";
-            try
-            {
-                HttpClient client = new HttpClient();
-                rawmessage = await client.GetStringAsync(baseAddress);
-            }
-            catch (Exception)
-            {
-                rawmessage = "[]";
-            }
-            if (rawmessage == "[]")
-            {
-                anchorAmount = 0;
-            }
-            else
-            {
-                string[] splitmessage = rawmessage.Trim(new char[] { '[', ']' }).Replace("},{", "};{").Split(';');
-                Anchor anchorObject = JsonUtility.FromJson<Anchor>(splitmessage[0]);
-                anchorTypes.Add(anchorObject.anchorKey, anchorObject.anchorType);
-                anchorOrder.Add(anchorObject.id, anchorObject.anchorKey);
-                anchors.Add(anchorObject);
-                anchorAmount = 1;
-                aemsg = anchorObject.anchorKey;
-                /*
-                foreach (String singlemessage in splitmessage)
-                {
-                    aemsg = singlemessage;
-                    Anchor anchorObject = JsonUtility.FromJson<Anchor>(singlemessage);
-                    anchors.Add(anchorObject);
-                    lock (anchorTypes)
-                    {
-                        anchorTypes.Add(anchorObject.anchorKey, anchorObject.anchorType);
-                    }
-                    lock (anchorOrder)
-                    {
-                        anchorOrder.Add(anchorObject.id, anchorObject.anchorKey);
-                    }
-                }
-
-                anchorAmount = anchors.Count;
-                */
-            }
-
-        }
         internal async Task<long> StoreAnchorKey(string anchorKey)
         {
-            if (string.IsNullOrWhiteSpace(anchorKey))
-            {
-                return -1;
-            }
-
             try
             {
                 HttpClient client = new HttpClient();
+                
                 var response = await client.PostAsync(baseAddress, new StringContent(anchorKey));
                 if (response.IsSuccessStatusCode)
                 {
