@@ -57,13 +57,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             CreatorMode,
             Saving,
             Searching,
-            Finished
+            Finished, 
+            Error
         }
         private AppState currentAppState = AppState.Initializing;
-        private bool isErrorActive = false;
-        public string printmsg = "";
-        private readonly int numToMake = 7;
-        private int locatedCount = 0;
         #endregion Helper Variables
         #region Class References
         public AnchorExchanger anchorExchanger = new AnchorExchanger();
@@ -75,7 +72,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #region Game Objects
         private GameObject spawnedObject = null;
         private Material spawnedObjectMat = null;
-        private Text feedbackBox;
+        public Text feedbackBox;
 
         public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
@@ -91,9 +88,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             guide = new NavigationGuide(this);
             anchorExchanger.getAnchors();
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
-
-            CloudManager.AnchorLocated += CloudManager_AnchorLocated;
-  
+            CloudManager.AnchorLocated += OnAnchorLocated;
             anchorLocateCriteria = new AnchorLocateCriteria();
             await CloudManager.StartSessionAsync();
         }
@@ -104,18 +99,19 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.Update();
             guide.Update();
-            feedbackBox.text = $"{currentAppState} ({locatedCount}/{anchorExchanger.anchorOrder.Count}) {printmsg}";
             if (currentAppState == AppState.Initializing)
             {
                 if (anchorExchanger.anchorAmount == 0)
                 {
+                    XRUXPicker.Instance.EnableNextButton();
+                    feedbackBox.text = "Please place an anchor and click save to proceed.";
                     currentAppState = AppState.CreatorMode;
                 }
                 if (anchorExchanger.anchorAmount > 0)
                 {
+                    feedbackBox.text = "Move your device to find existing anchors.";
                     anchorLocateCriteria.Strategy = LocateStrategy.AnyStrategy;
                     anchorLocateCriteria.Identifiers = new List<String>(anchorExchanger.anchorTypes.Keys).ToArray();
-                    locatedCount = 0;
                     currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
                     currentAppState = AppState.Searching;
                 }
@@ -125,68 +121,30 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             if (currentAppState == AppState.CreatorMode && spawnedObject != null)
             {
-                    currentAppState = AppState.Saving;
-                    if (!CloudManager.IsSessionStarted)
-                    {
-                        await CloudManager.StartSessionAsync();
-                    }
-                    await SaveCurrentObjectAnchorToCloudAsync();
+                currentAppState = AppState.Saving;
+                if (!CloudManager.IsSessionStarted)
+                {
+                    await CloudManager.StartSessionAsync();
+                }
+                await SaveCurrentObjectAnchorToCloudAsync();
             }
         }
-        private void CloudManager_AnchorLocated(object sender, AnchorLocatedEventArgs args)
+        private void OnAnchorLocated(object sender, AnchorLocatedEventArgs args)
         {
-            Debug.LogFormat("Anchor recognized as a possible anchor {0} {1}", args.Identifier, args.Status);
-
             if (args.Status == LocateAnchorStatus.Located)
             {
+                feedbackBox.text = "Please follow the dog to get to your destination";
                 UnityDispatcher.InvokeOnAppThread(() =>
                 {
-                    locatedCount++;
                     currentCloudAnchor = args.Anchor;
                     Pose anchorPose = Pose.identity;
-
-#if UNITY_ANDROID || UNITY_IOS
+                    #if UNITY_ANDROID || UNITY_IOS
                     anchorPose = currentCloudAnchor.GetPose();
-#endif
+                    #endif
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
                     SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
                     spawnedObject = null;
                 });
-            }
-
-        }
-        protected async Task OnSaveCloudAnchorSuccessfulAsync()
-        {
-            anchorExchanger.anchorTypes.Add(currentCloudAnchor.Identifier, 0);
-
-            printmsg = await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
-
-            // Sanity check that the object is still where we expect
-            Pose anchorPose = Pose.identity;
-
-#if UNITY_ANDROID || UNITY_IOS
-            anchorPose = currentCloudAnchor.GetPose();
-#endif
-            // HoloLens: The position will be set based on the unityARUserAnchor that was located.
-
-
-            SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
-
-            spawnedObject = null;
-            currentCloudAnchor = null;
-
-            if (allspawnedObjects.Count < numToMake)
-            {
-                printmsg = "";
-                feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
-                currentAppState = AppState.CreatorMode;
-                CloudManager.StopSession();
-            }
-            else
-            {
-                printmsg = "Please restart the App to start visitor mode";
-                feedbackBox.text = "Please restart the App to start visitor mode";
-                CloudManager.StopSession();
             }
         }
         /// <summary>
@@ -196,55 +154,54 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             // Get the cloud-native anchor behavior
             CloudNativeAnchor cna = spawnedObject.GetComponent<CloudNativeAnchor>();
-
             // If the cloud portion of the anchor hasn't been created yet, create it
             if (cna.CloudAnchor == null) { cna.NativeToCloud(); }
-
             // Get the cloud portion of the anchor
             CloudSpatialAnchor cloudAnchor = cna.CloudAnchor;
-
             // In this sample app we delete the cloud anchor explicitly, but here we show how to set an anchor to expire automatically
             cloudAnchor.Expiration = DateTimeOffset.Now.AddDays(7);
-
             while (!CloudManager.IsReadyForCreate)
             {
                 await Task.Delay(330);
                 float createProgress = CloudManager.SessionStatus.RecommendedForCreateProgress;
-                printmsg = $"Move your device to capture more environment data: {createProgress:0%}";
                 feedbackBox.text = $"Move your device to capture more environment data: {createProgress:0%}";
-                // scanImage.SetActive(true);
             }
-
-            bool success = false;
-            //scanImage.SetActive(false);
-            printmsg = "Saving...";
-            feedbackBox.text = "Saving...";
-
+            feedbackBox.text = "Saving Anchor to the ASA Service...";
             try
             {
                 // Actually save
                 await CloudManager.CreateAnchorAsync(cloudAnchor);
-
                 // Store
                 currentCloudAnchor = cloudAnchor;
-
                 // Success?
-                success = currentCloudAnchor != null;
-
-                if (success && !isErrorActive)
+                if (currentCloudAnchor != null && currentAppState != AppState.Error)
                 {
-                    // Await override, which may perform additional tasks
-                    // such as storing the key in the AnchorExchanger
-                    await OnSaveCloudAnchorSuccessfulAsync();
+                    feedbackBox.text = "Saving Anchor to Database...";
+                    await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier);
+                    // Sanity check that the object is still where we expect
+                    Pose anchorPose = Pose.identity;
+
+                    #if UNITY_ANDROID || UNITY_IOS
+                    anchorPose = currentCloudAnchor.GetPose();
+                    #endif
+                    // HoloLens: The position will be set based on the unityARUserAnchor that was located.
+
+                    SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
+                    spawnedObject = null;
+                    currentCloudAnchor = null;
+                    currentAppState = AppState.CreatorMode;
+                    feedbackBox.text = "Success, place your next Anchor";
                 }
                 else
                 {
-                    OnSaveCloudAnchorFailedB(new Exception("Failed to save, but no exception was thrown."));
+                    currentAppState = AppState.Error;
+                    this.feedbackBox.text = "There was an error in the ASA Service";
                 }
             }
             catch (Exception ex)
             {
-                OnSaveCloudAnchorFailedB(ex);
+                currentAppState = AppState.Error;
+                UnityDispatcher.InvokeOnAppThread(() => this.feedbackBox.text = string.Format("Error: {0}", ex.ToString()));
             }
         }
         #region Object Handlers
@@ -448,18 +405,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #endif
             }
         }
-        /// <summary>
-        /// Called when a cloud anchor is not saved successfully.
-        /// </summary>
-        /// <param name="exception">The exception.</param>
-        protected virtual void OnSaveCloudAnchorFailedB(Exception exception)
-        {
-            // we will block the next step to show the exception message in the UI.
-            isErrorActive = true;
-            Debug.LogException(exception);
-            Debug.Log("Failed to save anchor " + exception.ToString());
-            UnityDispatcher.InvokeOnAppThread(() => this.feedbackBox.text = string.Format("Error: {0}", exception.ToString()));
-        }
+
         /// <summary>
         /// Called when a select interaction occurs.
         /// </summary>

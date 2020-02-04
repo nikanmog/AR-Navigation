@@ -72,6 +72,28 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
 
         /// <summary>
+        /// Gets the correct feedback text control for the demo
+        /// </summary>
+        /// <returns>The feedback text control if it found it</returns>
+        public void EnableNextButton()
+        {
+            GameObject sourceTree = null;
+
+#if UNITY_WSA
+            return;
+#else
+            sourceTree = MobileAndEditorUXTree;
+#endif
+
+            GameObject button = sourceTree.transform.Find("Button").gameObject;
+            if (button != null)
+            {
+                button.SetActive(true);
+                return;
+            }
+        }
+
+        /// <summary>
         /// Gets the button used in the demo.
         /// </summary>
         /// <returns>The button used in the demo.  Returns null on HoloLens</returns>

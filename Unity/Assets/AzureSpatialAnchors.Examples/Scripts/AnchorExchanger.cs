@@ -67,7 +67,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             return defaultType;
         }
-
         internal async Task<string> StoreAnchorKey(string anchorKey)
         {
             try
@@ -80,6 +79,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 var result = await client.PostAsync(baseAddress, byteContent);
                 if (result.IsSuccessStatusCode){
+                    anchorTypes.Add(anchorKey, 0);
                     return "";
                 }
                 else

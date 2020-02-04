@@ -28,7 +28,7 @@ public class NavigationGuide : MonoBehaviour
     {
         if(guide == null)
         {
-            guide = GameObject.Instantiate(arnavigation.guidePrefab,guidePosition(), guideDirection());
+            guide = GameObject.Instantiate(arnavigation.guidePrefab,guidePosition(), Quaternion.LookRotation(path()));
             anim = guide.GetComponent<Animation>();
         }
     }
@@ -42,18 +42,6 @@ public class NavigationGuide : MonoBehaviour
     private GameObject destination()
     {
         return arnavigation.allspawnedObjects[arnavigation.anchorExchanger.anchorOrder[destinationId]];
-    }
-    private void moveToNextObject()
-    {
-        if (destinationId < arnavigation.anchorExchanger.anchorOrder.Count)
-        {
-            originId += 1;
-            destinationId += 1;
-        }
-    }
-    private Quaternion guideDirection()
-    {
-        return Quaternion.LookRotation(path());
     }
     private Quaternion guideToCamera()
     {
@@ -76,11 +64,12 @@ public class NavigationGuide : MonoBehaviour
         { // At destination
             reachedDestination = true;
             guide.transform.rotation = guideToCamera();
+            arnavigation.feedbackBox.text = "Reached Destination";
             anim.Play("0|rollover_0");
         } else
         { // On the move
             guide.transform.position = guidePosition();
-            guide.transform.rotation = guideDirection();
+            guide.transform.rotation = Quaternion.LookRotation(path());
             anim.Play("0|standing_0");
         }
 
@@ -102,7 +91,11 @@ public class NavigationGuide : MonoBehaviour
         float multiplicator = guideProgress() * 1.4f;
         if (multiplicator >= 1)
         {
-            moveToNextObject();
+            if (destinationId < arnavigation.anchorExchanger.anchorOrder.Count)
+            {
+                originId += 1;
+                destinationId += 1;
+            }
             return origin().transform.position + path() * 1.0f;
         }
         //arnavigation.printmsg = "MP:" + multiplicator + " OR:" + originId + "DS" + destinationId;

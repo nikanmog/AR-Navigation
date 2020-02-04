@@ -188,9 +188,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'Welcome to Microsoft
-
-    (click to continue)'
+  m_Text: Contacting Server...
 --- !u!222 &126543817
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -347,7 +345,6 @@ MonoBehaviour:
   anchoredObjectPrefab6: {fileID: 0}
   anchoredObjectPrefab7: {fileID: 0}
   CloudManager: {fileID: 294771744}
-  printmsg: 
 --- !u!4 &294771743
 Transform:
   m_ObjectHideFlags: 0
@@ -1448,7 +1445,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Next Step
+  m_Text: Save Anchor
 --- !u!222 &1286865768
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1690,9 +1687,7 @@ PrefabInstance:
     - target: {fileID: 114590902890860726, guid: da02f5d9dfcce824b88f56189675924d,
         type: 3}
       propertyPath: m_Text
-      value: 'Welcome to Microsoft
-
-        (click to continue)'
+      value: Contacting Server...
       objectReference: {fileID: 0}
     - target: {fileID: 114590902890860726, guid: da02f5d9dfcce824b88f56189675924d,
         type: 3}
