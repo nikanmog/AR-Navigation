@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 
 namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
@@ -19,6 +20,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
     public class AnchorExchanger
     {
         private string baseAddress = "";
+        public string aemsg = "";
         public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
         public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
@@ -59,8 +61,26 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             try
             {
+                aemsg = "before";
                 HttpClient client = new HttpClient();
-                
+                Anchor anchor = new Anchor();
+                anchor.anchorKey = anchorKey;
+                anchor.anchorType = 0;
+                anchor.demo = "test";
+                anchor.id = -1;
+                string jsoncontent = JsonUtility.ToJson(anchor);
+                var buffer = System.Text.Encoding.UTF8.GetBytes(jsoncontent);
+                var byteContent = new ByteArrayContent(buffer);
+                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                var result = await client.PostAsync(baseAddress, byteContent);
+
+
+                aemsg = result.StatusCode.ToString();
+                string responseBody = await result.Content.ReadAsStringAsync();
+                //aemsg = responseBody;
+
+
+                /*
                 var response = await client.PostAsync(baseAddress, new StringContent(anchorKey));
                 if (response.IsSuccessStatusCode)
                 {
@@ -83,13 +103,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                 Debug.LogError($"Failed to store the anchor key: {anchorKey}.");
                 return -1;
+
+    */
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                Debug.LogException(ex);
-                Debug.LogError($"Failed to store the anchor key: {anchorKey}.");
                 return -1;
             }
+            return 0L;
         }
     }
 }

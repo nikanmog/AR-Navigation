@@ -27,6 +27,23 @@ namespace webservice.Controllers
             return await _context.Anchors.ToListAsync();
         }
         [HttpPost]
+        public async Task<ActionResult<Anchor>> PostAsync(Anchor anchor)
+        {
+            Anchor save = new Anchor();
+            save.AnchorKey = anchor.AnchorKey;
+            save.AnchorType = anchor.AnchorType;
+            save.Demo = anchor.Demo;
+   
+
+            _context.Anchors.Add(save);
+            await _context.SaveChangesAsync();
+            return save;
+        }
+
+
+
+
+        /*        [HttpPost]
         public async Task<ActionResult<int>> PostAsync()
         {
             string anchorKey;
@@ -46,7 +63,12 @@ namespace webservice.Controllers
             _context.Anchors.Add(anchor);
             _context.SaveChanges();
             return anchor.Id;
-        }
+        }*/
+
+
+
+
+
         [HttpDelete]
         public void DeleteAnchor()
         {
