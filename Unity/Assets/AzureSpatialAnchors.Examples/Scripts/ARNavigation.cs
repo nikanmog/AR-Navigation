@@ -77,7 +77,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
-
         /// <summary>
         /// Start is called on the frame when a script is enabled just before any
         /// of the Update methods are called the first time.
@@ -88,7 +87,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             guide = new NavigationGuide(this);
             anchorExchanger.getAnchors();
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
-            CloudManager.AnchorLocated += OnAnchorLocated;
+            CloudManager.AnchorLocated += AnchorLocated;
             anchorLocateCriteria = new AnchorLocateCriteria();
             await CloudManager.StartSessionAsync();
         }
@@ -126,10 +125,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 {
                     await CloudManager.StartSessionAsync();
                 }
-                await SaveCurrentObjectAnchorToCloudAsync();
+                await SaveAnchorAsync();
             }
         }
-        private void OnAnchorLocated(object sender, AnchorLocatedEventArgs args)
+        private void AnchorLocated(object sender, AnchorLocatedEventArgs args)
         {
             if (args.Status == LocateAnchorStatus.Located)
             {
@@ -150,7 +149,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <summary>
         /// Saves the current object anchor to the cloud.
         /// </summary>
-        protected virtual async Task SaveCurrentObjectAnchorToCloudAsync()
+        protected virtual async Task SaveAnchorAsync()
         {
             // Get the cloud-native anchor behavior
             CloudNativeAnchor cna = spawnedObject.GetComponent<CloudNativeAnchor>();

@@ -345,6 +345,7 @@ MonoBehaviour:
   anchoredObjectPrefab6: {fileID: 0}
   anchoredObjectPrefab7: {fileID: 0}
   CloudManager: {fileID: 294771744}
+  feedbackBox: {fileID: 0}
 --- !u!4 &294771743
 Transform:
   m_ObjectHideFlags: 0
@@ -395,7 +396,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &339971470
 RectTransform:
   m_ObjectHideFlags: 0
