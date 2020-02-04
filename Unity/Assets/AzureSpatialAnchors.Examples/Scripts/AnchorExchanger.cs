@@ -30,9 +30,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public Dictionary<string, int> anchorTypes = new Dictionary<string, int>();
         public Dictionary<int, string> anchorOrder = new Dictionary<int, string>();
         public int anchorAmount = -1;
-        public async void GetAnchors(string exchangerUrl)
+        public async void GetAnchors()
         {
-            baseAddress = exchangerUrl;
+            baseAddress = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
+            Uri result;
+            if (Uri.TryCreate(baseAddress, UriKind.Absolute, out result))
+            {
+                baseAddress = $"{result.Scheme}://{result.Host}/api/anchors";
+            }
             try
             {
                 HttpClient client = new HttpClient();

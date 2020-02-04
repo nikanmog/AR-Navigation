@@ -53,13 +53,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #region Helper Variables
         private enum AppState
         {
-            Placing = 0,
-            Saving,
             Initializing,
-            ReadyToSearch,
+            CreatorMode,
+            Saving,
             Searching,
-            ReadyToNeighborQuery,
-            Neighboring,
+            Finished
         }
         private AppState currentAppState = AppState.Initializing;
         private bool isErrorActive = false;
@@ -91,22 +89,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Start()
         {
             guide = new NavigationGuide(this);
-            string BaseSharingUrl = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
-            Uri result;
-            if (Uri.TryCreate(BaseSharingUrl, UriKind.Absolute, out result))
-            {
-                BaseSharingUrl = $"{result.Scheme}://{result.Host}/api/anchors";
-            }
-            anchorExchanger.GetAnchors(BaseSharingUrl);
+            anchorExchanger.GetAnchors();
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             CloudManager.SessionUpdated += CloudManager_SessionUpdated;
             CloudManager.AnchorLocated += CloudManager_AnchorLocated;
             CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
             CloudManager.LogDebug += CloudManager_LogDebug;
             CloudManager.Error += CloudManager_Error;
+            CloudManager.StartSessionAsync();
             anchorLocateCriteria = new AnchorLocateCriteria();
             base.Start();
-            
         }
         /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
@@ -123,57 +115,31 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     anchorOrder = anchorExchanger.anchorOrder;
                     if (anchorExchanger.anchorAmount == 0)
                     {
-                        currentAppState = AppState.Placing;
+                        currentAppState = AppState.CreatorMode;
                     }
                     if (anchorTypes.Count == anchorExchanger.anchorAmount && anchorExchanger.anchorAmount > 0)
                     {
-                        currentAppState = AppState.ReadyToSearch;
-                    }
-                    break;
-                case AppState.Neighboring:
-                    feedbackBox.text = $"Explore the office to find all markers. {locatedCount}/{numToMake - 1}";
-                    if (locatedCount == numToMake - 1)
-                    {
-                        printmsg = "";
-                        feedbackBox.text = "";
+                        
+                        anchorLocateCriteria.Strategy = LocateStrategy.AnyStrategy;
+                        anchorLocateCriteria.Identifiers = new List<String>(anchorTypes.Keys).ToArray();
+                        locatedCount = 0;
+                        currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
+                        currentAppState = AppState.Searching;
+                        break;
                     }
                     break;
             }
-
         }
         public async Task AdvanceDemoAsync()
         {
-            switch (currentAppState)
+            if (currentAppState == AppState.CreatorMode && spawnedObject != null)
             {
-                case AppState.Placing:
-                    if (spawnedObject != null)
+                    currentAppState = AppState.Saving;
+                    if (!CloudManager.IsSessionStarted)
                     {
-                        currentAppState = AppState.Saving;
-                        if (!CloudManager.IsSessionStarted)
-                        {
-                            await CloudManager.StartSessionAsync();
-                        }
-                        await SaveCurrentObjectAnchorToCloudAsync();
+                        await CloudManager.StartSessionAsync();
                     }
-                    break;
-                case AppState.ReadyToSearch:
-                    await CloudManager.ResetSessionAsync();
-                    await CloudManager.StartSessionAsync();
-                    SetGraphEnabled(true);
-                    anchorLocateCriteria.Identifiers = new List<String>(anchorTypes.Keys).ToArray();
-                    locatedCount = 0;
-                    currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
-                    currentAppState = AppState.Searching;
-                    break;
-                case AppState.ReadyToNeighborQuery: //Currently disabled in OnCloudAnchorLocated
-                    SetGraphEnabled(true);
-                    anchorTypes = new Dictionary<string, int>();
-                    SetNearbyAnchor(currentCloudAnchor, 20, numToMake);
-                    locatedCount = 0;
-                    currentWatcher = CloudManager.Session.CreateWatcher(anchorLocateCriteria);
-                    currentAppState = AppState.Neighboring;
-                    break;
-
+                    await SaveCurrentObjectAnchorToCloudAsync();
             }
         }
         protected void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
@@ -190,15 +156,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     anchorPose = currentCloudAnchor.GetPose();
 #endif
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
-
                     SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
-
                     spawnedObject = null;
-
-                    //if (currentAppState == AppState.Searching)
-                    //{
-                    //    currentAppState = AppState.ReadyToNeighborQuery;
-                    //}
                 });
             }
         }
@@ -226,15 +185,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 printmsg = "";
                 feedbackBox.text = $"Saved...Make another {allspawnedObjects.Count}/{numToMake} ";
-                currentAppState = AppState.Placing;
+                currentAppState = AppState.CreatorMode;
                 CloudManager.StopSession();
             }
             else
             {
-                printmsg = "";
-                feedbackBox.text = "Saved... ready to start finding them.";
+                printmsg = "Please restart the App to start visitor mode";
+                feedbackBox.text = "Please restart the App to start visitor mode";
                 CloudManager.StopSession();
-                currentAppState = AppState.ReadyToSearch;
             }
         }
         /// <summary>
@@ -309,12 +267,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             nac.MaxResultCount = MaxNearAnchorsToFind;
             anchorLocateCriteria.NearAnchor = nac;
         }
-        protected void SetGraphEnabled(bool UseGraph, bool JustGraph = false)
-        {
-            anchorLocateCriteria.Strategy = UseGraph ?
-                                            (JustGraph ? LocateStrategy.Relationship : LocateStrategy.AnyStrategy) :
-                                            LocateStrategy.VisualInformation;
-        }
+
         #region Object Handlers
         /// <summary>
         /// Spawns a new anchored object.
@@ -507,7 +460,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         protected override void OnGazeObjectInteraction(Vector3 hitPoint, Vector3 hitNormal)
         {
             base.OnGazeObjectInteraction(hitPoint, hitNormal);
-            if (currentAppState == AppState.Placing)
+            if (currentAppState == AppState.CreatorMode)
             {
         #if WINDOWS_UWP || UNITY_WSA
                 Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
@@ -547,7 +500,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <param name="target">The target.</param>
         protected override void OnSelectObjectInteraction(Vector3 hitPoint, object target)
         {
-            if (currentAppState == AppState.Placing)
+            if (currentAppState == AppState.CreatorMode)
             {
                 Vector3 direction = new Vector3(Camera.main.transform.position.x - hitPoint.x, Camera.main.transform.position.y - hitPoint.y, Camera.main.transform.position.z - hitPoint.z);
                 Quaternion rotation = Quaternion.LookRotation(direction);
@@ -560,7 +513,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <param name="touch">The touch.</param>
         protected override void OnTouchInteraction(Touch touch)
         {
-            if (currentAppState == AppState.Placing)
+            if (currentAppState == AppState.CreatorMode)
             {
                 base.OnTouchInteraction(touch);
             }
