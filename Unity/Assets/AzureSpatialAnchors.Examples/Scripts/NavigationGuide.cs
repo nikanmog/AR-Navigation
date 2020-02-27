@@ -79,7 +79,7 @@ public class NavigationGuide : MonoBehaviour
         float multiplicator = 0.0f;
         float newDistance = 999999.0f;
         float previousDistance = 99999999.0f;
-        for (multiplicator = 0.0f; newDistance < previousDistance && multiplicator <= 1.0f; multiplicator += 0.001f)
+        for (multiplicator = 0.0f; newDistance < previousDistance && multiplicator <= 1.0f; multiplicator += 0.002f)
         {
             previousDistance = newDistance;
             newDistance = Vector3.Distance(origin().transform.position + path() * multiplicator, Camera.main.transform.position);

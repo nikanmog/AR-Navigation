@@ -73,6 +73,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private GameObject spawnedObject = null;
         private Material spawnedObjectMat = null;
         public Text feedbackBox;
+        public Text inputBox;
 
         public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
@@ -87,6 +88,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             guide = new NavigationGuide(this);
             anchorExchanger.getAnchors();
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            inputBox = XRUXPicker.Instance.GetTextInput();
             CloudManager.AnchorLocated += AnchorLocated;
             anchorLocateCriteria = new AnchorLocateCriteria();
             await CloudManager.StartSessionAsync();
@@ -98,6 +100,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.Update();
             guide.Update();
+            //XRUXPicker.Instance.TextInputVisible(true);
+            //feedbackBox.text = inputBox.text;
             if (currentAppState == AppState.Initializing)
             {
                 if (anchorExchanger.anchorAmount == 0)

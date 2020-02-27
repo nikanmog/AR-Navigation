@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -70,11 +71,33 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Debug.LogError("Did not find feedback text control.");
             return null;
         }
+        public Text GetTextInput()
+        {
+            GameObject sourceTree = null;
 
-        /// <summary>
-        /// Gets the correct feedback text control for the demo
-        /// </summary>
-        /// <returns>The feedback text control if it found it</returns>
+#if UNITY_WSA
+            sourceTree = HoloLensUXTree;
+#else
+            sourceTree = MobileAndEditorUXTree;
+#endif
+
+            Debug.Log(sourceTree.transform.childCount);
+            int childCount = sourceTree.transform.childCount;
+            for (int index = 2; index < childCount; index++)
+            {
+                GameObject child = sourceTree.transform.GetChild(index).gameObject;
+
+                Text t = child.GetComponent<Text>();
+                if (t != null)
+                {
+                    return t;
+                }
+
+            }
+
+            Debug.LogError("Did not find feedback text control.");
+            return null;
+        }
         public void EnableNextButton()
         {
             GameObject sourceTree = null;
@@ -92,7 +115,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return;
             }
         }
+        public void TextInputVisible(bool visible)
+        {
+            GameObject sourceTree = null;
 
+#if UNITY_WSA
+            return;
+#else
+            sourceTree = MobileAndEditorUXTree;
+#endif
+
+            GameObject button = sourceTree.transform.Find("InputField").gameObject;
+            if (button != null)
+            {
+                button.SetActive(visible);
+                return;
+            }
+        }
         /// <summary>
         /// Gets the button used in the demo.
         /// </summary>
