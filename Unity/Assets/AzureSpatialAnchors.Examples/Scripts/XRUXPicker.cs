@@ -98,7 +98,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Debug.LogError("Did not find feedback text control.");
             return null;
         }
-        public void EnableNextButton()
+        public void NextButtonVisible(bool visible)
         {
             GameObject sourceTree = null;
 
@@ -111,7 +111,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             GameObject button = sourceTree.transform.Find("Button").gameObject;
             if (button != null)
             {
-                button.SetActive(true);
+                button.SetActive(visible);
                 return;
             }
         }

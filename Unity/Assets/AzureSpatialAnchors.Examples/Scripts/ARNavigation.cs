@@ -51,8 +51,16 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private SpatialAnchorManager CloudManager = null;
         #endregion
         #region Helper Variables
+        private enum SetUp: int
+        {
+            InputWebServiceUrl = 0,
+            InputASAId = 1,
+            InputASAKey = 2,
+            finished = 3
+        }
         private enum AppState
         {
+            FirstLaunch,
             Initializing,
             CreatorMode,
             Saving,
@@ -60,7 +68,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Finished, 
             Error
         }
-        private AppState currentAppState = AppState.Initializing;
+        private AppState currentAppState = AppState.FirstLaunch;
         #endregion Helper Variables
         #region Class References
         public AnchorExchanger anchorExchanger = new AnchorExchanger();
@@ -74,7 +82,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private Material spawnedObjectMat = null;
         public Text feedbackBox;
         public Text inputBox;
-
+        private SetUp setup;
         public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
@@ -85,10 +93,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override async void Start()
         {
             base.Start();
+            setup = (SetUp)PlayerPrefs.GetInt("setup", 0);
+            if(setup == SetUp.finished)
+            {
+                XRUXPicker.Instance.TextInputVisible(false);
+                currentAppState = AppState.Initializing;
+                anchorExchanger.getAnchors();
+            }
             guide = new NavigationGuide(this);
-            anchorExchanger.getAnchors();
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             inputBox = XRUXPicker.Instance.GetTextInput();
+            XRUXPicker.Instance.NextButtonVisible(true);
             CloudManager.AnchorLocated += AnchorLocated;
             anchorLocateCriteria = new AnchorLocateCriteria();
             await CloudManager.StartSessionAsync();
@@ -100,18 +115,40 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.Update();
             guide.Update();
-            //XRUXPicker.Instance.TextInputVisible(true);
-            //feedbackBox.text = inputBox.text;
+            if (currentAppState == AppState.FirstLaunch)
+            {
+                switch (setup)
+                {
+                    case SetUp.InputWebServiceUrl:
+                        feedbackBox.text = "Please input the Webservice URL";
+                        break;
+                    case SetUp.InputASAId:
+                        feedbackBox.text = "Please input the ASA Account ID";
+                        break;
+                    case SetUp.InputASAKey:
+                        feedbackBox.text = "Please input the ASA Account Key";
+                        break;
+                    case SetUp.finished:
+                        PlayerPrefs.SetInt("setup", 3);
+                        PlayerPrefs.Save();
+                        currentAppState = AppState.Initializing;
+                        XRUXPicker.Instance.TextInputVisible(false);
+                        CloudManager.LoadConfiguration();
+                        anchorExchanger.getAnchors();
+                        break;
+                }
+            }
             if (currentAppState == AppState.Initializing)
             {
                 if (anchorExchanger.anchorAmount == 0)
                 {
-                    XRUXPicker.Instance.EnableNextButton();
+                    XRUXPicker.Instance.NextButtonVisible(true);
                     feedbackBox.text = "Please place an anchor and click save to proceed.";
                     currentAppState = AppState.CreatorMode;
                 }
                 if (anchorExchanger.anchorAmount > 0)
                 {
+                    XRUXPicker.Instance.NextButtonVisible(false);
                     feedbackBox.text = "Move your device to find existing anchors.";
                     anchorLocateCriteria.Strategy = LocateStrategy.AnyStrategy;
                     anchorLocateCriteria.Identifiers = new List<String>(anchorExchanger.anchorTypes.Keys).ToArray();
@@ -120,8 +157,33 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
         }
-        public async Task PlaceObject()
+        public async Task AdvanceDemoAsync()
         {
+            if (currentAppState == AppState.FirstLaunch)
+            {
+                switch (setup)
+                {
+                    case SetUp.InputWebServiceUrl:
+                        PlayerPrefs.SetString("Webservice", inputBox.text);
+                        PlayerPrefs.Save();
+                        setup += 1;
+                        break;
+                    case SetUp.InputASAId:
+                        PlayerPrefs.SetString("AccountId", inputBox.text);
+                        PlayerPrefs.Save();
+                        setup += 1;
+                        break;
+                    case SetUp.InputASAKey:
+                        PlayerPrefs.SetString("AccountKey", inputBox.text);
+                        PlayerPrefs.Save();
+                        setup += 1;
+                        break;
+                    case SetUp.finished:
+                        break;
+                }
+            }
+
+
             if (currentAppState == AppState.CreatorMode && spawnedObject != null)
             {
                 currentAppState = AppState.Saving;
@@ -329,7 +391,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             try
             {
-                await PlaceObject();
+                await AdvanceDemoAsync();
             }
             catch (Exception)
             {

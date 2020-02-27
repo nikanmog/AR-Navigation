@@ -32,7 +32,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public int anchorAmount = -1;
         public async void getAnchors()
         {
-            baseAddress = Resources.Load<SpatialAnchorSamplesConfig>("SpatialAnchorSamplesConfig").BaseSharingURL;
+            
+            baseAddress = PlayerPrefs.GetString("Webservice");
             Uri result;
             if (Uri.TryCreate(baseAddress, UriKind.Absolute, out result))
             {

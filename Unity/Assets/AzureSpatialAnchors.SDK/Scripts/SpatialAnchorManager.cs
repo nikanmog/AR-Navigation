@@ -277,7 +277,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
         /// <summary>
         /// Called when the manager initializes in order to configure the service.
         /// </summary>
-        protected virtual void LoadConfiguration()
+        public virtual void LoadConfiguration()
         {
             // Attempt to load configuration from config resource if present.
             SpatialAnchorConfig config = Resources.Load<SpatialAnchorConfig>("SpatialAnchorConfig");
@@ -285,16 +285,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity
             {
                 // Apply auth mode
                 authenticationMode = config.AuthenticationMode;
-
+                spatialAnchorsAccountId = PlayerPrefs.GetString("AccountId");
+                spatialAnchorsAccountKey = PlayerPrefs.GetString("AccountKey");
                 // Apply auth values
-                if (string.IsNullOrWhiteSpace(spatialAnchorsAccountId))
-                {
-                    spatialAnchorsAccountId = config.SpatialAnchorsAccountId;
-                }
-                if (string.IsNullOrWhiteSpace(spatialAnchorsAccountKey))
-                {
-                    spatialAnchorsAccountKey = config.SpatialAnchorsAccountKey;
-                }
+  
                 if (string.IsNullOrWhiteSpace(clientId))
                 {
                     clientId = config.ClientId;
