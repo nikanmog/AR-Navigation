@@ -86,6 +86,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public Dictionary<string, GameObject> allspawnedObjects = new Dictionary<string, GameObject>();
         private readonly List<Material> allSpawnedMaterials = new List<Material>();
         #endregion Game Objects
+        #region Main
         /// <summary>
         /// Start is called on the frame when a script is enabled just before any
         /// of the Update methods are called the first time.
@@ -94,7 +95,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.Start();
             setup = (SetUp)PlayerPrefs.GetInt("setup", 0);
-            if(setup == SetUp.finished)
+            if (setup == SetUp.finished)
             {
                 XRUXPicker.Instance.TextInputVisible(false);
                 currentAppState = AppState.Initializing;
@@ -104,6 +105,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             feedbackBox = XRUXPicker.Instance.GetFeedbackText();
             inputBox = XRUXPicker.Instance.GetTextInput();
             XRUXPicker.Instance.NextButtonVisible(true);
+            feedbackBox.text = "Please input the Webservice URL and click save.";
             CloudManager.AnchorLocated += AnchorLocated;
             anchorLocateCriteria = new AnchorLocateCriteria();
             await CloudManager.StartSessionAsync();
@@ -115,29 +117,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.Update();
             guide.Update();
-            if (currentAppState == AppState.FirstLaunch)
-            {
-                switch (setup)
-                {
-                    case SetUp.InputWebServiceUrl:
-                        feedbackBox.text = "Please input the Webservice URL";
-                        break;
-                    case SetUp.InputASAId:
-                        feedbackBox.text = "Please input the ASA Account ID";
-                        break;
-                    case SetUp.InputASAKey:
-                        feedbackBox.text = "Please input the ASA Account Key";
-                        break;
-                    case SetUp.finished:
-                        PlayerPrefs.SetInt("setup", 3);
-                        PlayerPrefs.Save();
-                        currentAppState = AppState.Initializing;
-                        XRUXPicker.Instance.TextInputVisible(false);
-                        CloudManager.LoadConfiguration();
-                        anchorExchanger.getAnchors();
-                        break;
-                }
-            }
             if (currentAppState == AppState.Initializing)
             {
                 if (anchorExchanger.anchorAmount == 0)
@@ -156,34 +135,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentAppState = AppState.Searching;
                 }
             }
+            
         }
         public async Task AdvanceDemoAsync()
         {
-            if (currentAppState == AppState.FirstLaunch)
+            if (currentAppState == AppState.FirstLaunch && inputBox.text.Length > 0)
             {
-                switch (setup)
-                {
-                    case SetUp.InputWebServiceUrl:
-                        PlayerPrefs.SetString("Webservice", inputBox.text);
-                        PlayerPrefs.Save();
-                        setup += 1;
-                        break;
-                    case SetUp.InputASAId:
-                        PlayerPrefs.SetString("AccountId", inputBox.text);
-                        PlayerPrefs.Save();
-                        setup += 1;
-                        break;
-                    case SetUp.InputASAKey:
-                        PlayerPrefs.SetString("AccountKey", inputBox.text);
-                        PlayerPrefs.Save();
-                        setup += 1;
-                        break;
-                    case SetUp.finished:
-                        break;
-                }
+                setUpHelper();
             }
-
-
             if (currentAppState == AppState.CreatorMode && spawnedObject != null)
             {
                 currentAppState = AppState.Saving;
@@ -192,6 +151,45 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     await CloudManager.StartSessionAsync();
                 }
                 await SaveAnchorAsync();
+            }
+        }
+        private void setUpHelper()
+        {
+            switch (setup)
+            {
+                case SetUp.InputWebServiceUrl:
+                    PlayerPrefs.SetString("Webservice", inputBox.text);
+                    PlayerPrefs.Save();
+                    inputBox.text = "";
+                    setup += 1;
+                    feedbackBox.text = "Please input the ASA Account ID and click save.";
+                    break;
+                case SetUp.InputASAId:
+                    if(inputBox.text != PlayerPrefs.GetString("Webservice", "x"))
+                    {
+                        PlayerPrefs.SetString("AccountId", inputBox.text);
+                        PlayerPrefs.Save();
+                        inputBox.text = "";
+                        setup += 1;
+                        feedbackBox.text = "Please input the ASA Account Key and click save.";
+                    }
+                    break;
+                case SetUp.InputASAKey:
+                    if (inputBox.text != PlayerPrefs.GetString("AccountId", "x"))
+                    {
+                        PlayerPrefs.SetString("AccountKey", inputBox.text);
+                        PlayerPrefs.SetInt("setup", 3);
+                        PlayerPrefs.Save();
+                        inputBox.text = "";
+                        currentAppState = AppState.Initializing;
+                        XRUXPicker.Instance.TextInputVisible(false);
+                        CloudManager.LoadConfiguration();
+                        anchorExchanger.getAnchors();
+                        setup += 1;
+                    }
+                    break;
+                case SetUp.finished:
+                    break;
             }
         }
         private void AnchorLocated(object sender, AnchorLocatedEventArgs args)
@@ -269,6 +267,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 UnityDispatcher.InvokeOnAppThread(() => this.feedbackBox.text = string.Format("Error: {0}", ex.ToString()));
             }
         }
+        #endregion Main
         #region Object Handlers
         /// <summary>
         /// Spawns a new anchored object.
