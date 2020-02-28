@@ -6,27 +6,6 @@ Azure Spatial Anchors is a managed cloud service and platform that enables multi
 
 ![Implementation System Overview](Unity/SystemOverview.jpg "Implementation System Overview")
 
-# How to use the demo
-## AR Navigation Demo
-The workflow for the navigation demo is simple. There is a "Creator Mode" and a "Visitor Mode".
-On app launch the app checks whether you have already created anchors in a previous session or not (by contacting the webservice & CosmosDB). If no anchor is found, the creator mode is launched. If an anchor is found, the visitor mode is launched and all anchors are retrieved from the server. 
-- Creator Mode: Place anchors for the guide to follow. The guide will use the same sequence in which the anchors were created. 
-	- Important: Please make sure your anchors are not too far apart (especially on older devices). Otherwise the app will get stuck in the "saving" step (no connection can be made between two anchors). To fix this you have to delete all anchors (via the REST API) and start over :(
-- Visitor Mode: The app will download all anchors on app launch. Please click next to initiate anchor search in your environment.
-## Conference Room Demo
-- Open the AR-Navigation scene and set the guide object to null (in the AzureSpatialAnchors object)
-- Set the prefabs 1-8 to "Conference room busy.prefab" or "Conference room available.prefab"
-- The app will have the same workflow as in the navigation demo above (creator/visitor mode)
-- The prefab in visitor mode is set by the prefab ID which is downloaded at app start from the CosmosDB. To modify the prefab type at a specific position (e.g. change conference room monitor from free to busy) edit the number in the AnchorType column with the CosmosDB Data Explorer on portal.azure.com)
-
-## Delete or modify anchors
-- Anchors can be delete via the REST API of your webservice:
-	- Go to https://your-webserivce.azurewebsites.net/index.html in your browser
-	- Click "/api/anchors/delete" and then execute
-- You can set the prefab type remotely via the CosmosDB
-	- Open the AR-Navigation scene and assign prefabs (1-8) (in the AzureSpatialAnchors object) 
-	- After creating your objects you can modify the prefab type via the CosmosDB Data Explorer on portal.azure.com
-
 # First time setup
 This tutorial is a modified version of the original documentation found [here](https://docs.microsoft.com/en-us/azure/spatial-anchors/tutorials/tutorial-share-anchors-across-devices?tabs=VS%2CUnity).
 
@@ -77,6 +56,27 @@ Please create the app backend as described [here](Webservice/readme.md)
 ## Android Instructions
 1. Copy the .apk file to your android device and install it.
 2. Enter your webservice url, ASA Account ID and ASA Primary key in the app. [Microsoft Internal Instruction Video](https://msit.microsoftstream.com/video/c6b55dfe-5fc7-4563-bf5b-d53f6ae8a11c)
+
+# How to use the demo
+## AR Navigation Demo
+The workflow for the navigation demo is simple. There is a "Creator Mode" and a "Visitor Mode".
+On app launch the app checks whether you have already created anchors in a previous session or not (by contacting the webservice & CosmosDB). If no anchor is found, the creator mode is launched. If an anchor is found, the visitor mode is launched and all anchors are retrieved from the server. 
+- Creator Mode: Place anchors for the guide to follow. The guide will use the same sequence in which the anchors were created. 
+	- Important: Please make sure your anchors are not too far apart (especially on older devices). Otherwise the app will get stuck in the "saving" step (no connection can be made between two anchors). To fix this you have to delete all anchors (via the REST API) and start over :(
+- Visitor Mode: The app will download all anchors on app launch. Please click next to initiate anchor search in your environment.
+## Conference Room Demo
+- Open the AR-Navigation scene and set the guide object to null (in the AzureSpatialAnchors object)
+- Set the prefabs 1-8 to "Conference room busy.prefab" or "Conference room available.prefab"
+- The app will have the same workflow as in the navigation demo above (creator/visitor mode)
+- The prefab in visitor mode is set by the prefab ID which is downloaded at app start from the CosmosDB. To modify the prefab type at a specific position (e.g. change conference room monitor from free to busy) edit the number in the AnchorType column with the CosmosDB Data Explorer on portal.azure.com)
+
+## Delete or modify anchors
+- Anchors can be delete via the REST API of your webservice:
+	- Go to https://your-webserivce.azurewebsites.net/index.html in your browser
+	- Click "/api/anchors/delete" and then execute
+- You can set the prefab type remotely via the CosmosDB
+	- Open the AR-Navigation scene and assign prefabs (1-8) (in the AzureSpatialAnchors object) 
+	- After creating your objects you can modify the prefab type via the CosmosDB Data Explorer on portal.azure.com
 
 # More information about the Azure Spatial Anchors Service 
 
