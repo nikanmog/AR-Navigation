@@ -85,7 +85,7 @@ Under  **Settings**, select  **Key**. Copy the  **Primary key**  value into a te
 
 
 ## Create and publish app backend
-Please create the app backend as described [here](SQL-Backend/readme.md)
+Please create the app backend as described [here](Webservice/readme.md)
 
 
 ## Deploy the sample app
